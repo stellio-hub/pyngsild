@@ -40,7 +40,7 @@ class Property():
 
     # Object representation
     def __repr__(self):
-        return(f'Property(name={self.name}, value={self.value})')
+        return(f'Property(name={self.name}, value=\'{self.value}\')')
 
     # name attribute
     @property
