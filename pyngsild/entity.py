@@ -28,11 +28,11 @@ class Entity():
             self.properties = properties
         else:
             self.properties = None
-        self._at_context = None
+        self.at_context = None
 
     # Object representation
     def __repr__(self):
-        return('Class(id={self.id}, type=\'{self.type}\')')
+        return(f'Class(id=\'{self.id}\', type=\'{self.type}\')')
 
     # id attribute
     @property
@@ -58,7 +58,7 @@ class Entity():
         return(self._at_context)
 
     @at_context.setter
-    def at_contex(self, at_context):
+    def at_context(self, at_context):
         self._at_context = at_context
 
     # properties attribute
