@@ -136,7 +136,8 @@ class Property():
 
         Return:
         -------
-        NGSI-LD compliant representation of this Property
+        ngsild: Dictionary
+            NGSI-LD compliant representation of this Property
         '''
         ngsild = {
             self._name: {
