@@ -1,4 +1,4 @@
-from property import Property
+from pyngsild.property import Property
 
 
 class Entity():
