@@ -8,7 +8,7 @@ class Entity():
 
     Parameters:
     -----------
-    name: URI
+    id: URI
         Identifier of the entity
 
     type: str
