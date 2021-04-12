@@ -73,11 +73,15 @@ class Entity():
         where property(ies) could be added to existing properties.
         Here, previous properties are replaced by new properties.
         '''
-        if isinstance(properties, Property):
+        if properties is None:
+            self._properties = None
+        elif isinstance(properties, Property):
             self._properties = [properties]
         elif isinstance(properties, list):
             if not any(not isinstance(p, Property) for p in properties):
                 self._properties = properties
+        else:
+            raise TypeError
 
     def add_properties(self, properties):
         '''
@@ -143,7 +147,7 @@ class Entity():
             NGSI-LD compliant representation of this Entity
         '''
         ngsild = {
-            '@context': self.context,
+            '@context': self.at_context,
             'id': self.id,
             'type': self.type
         }
