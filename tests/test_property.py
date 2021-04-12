@@ -21,6 +21,7 @@ def get_a_sub_property():
                     value=37, observed_at=PROP_OBSERVED_AT, unit_code='CEL'))
 
 
+# TESTS
 def test_create_name_value():
     p = Property(PROP_NAME, PROP_VALUE)
     assert p.name == PROP_NAME and p.value == PROP_VALUE
