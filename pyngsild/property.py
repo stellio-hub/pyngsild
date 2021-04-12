@@ -22,6 +22,10 @@ class Property():
     datasetid: URI
         Instance of a property
 
+    properties: Property
+        One or more Property objects, the  property(ies) of this property
+        instance
+
     Return:
     -------
     Property: an instance of this class
