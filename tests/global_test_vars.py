@@ -18,8 +18,8 @@ AT_CONTEXT_LINK = '<https://raw.githubusercontent.com/senseen/'\
     'rel=http://www.w3.org/ns/json-ld#context; type=application/json'
 
 # GLOBALS for Entity Class tests
-ENT_ID = 'uri:myentity:1'
-ENT_TYPE = 'MY_ENTITY'
+E_ID = 'uri:entity:1'
+E_TYPE = 'ENTITY'
 
 # GLOBALS for Property Class tests
 PROP_1 = Property(name='plant_health', value=5,
@@ -32,3 +32,4 @@ PROP_3 = Property(name='pH', value=7.3, observed_at=OBSERVED_AT,
 # GLOBALS for Relationship tests
 R_NAME = 'to_object_1'
 R_OBJECT = 'uri:object_1'
+R_DATASETID = 'r:dataset:1'

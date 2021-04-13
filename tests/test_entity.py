@@ -4,7 +4,7 @@ from . import global_test_vars as g
 
 # Some utilities functions
 def get_an_entity():
-    e = Entity(id=g.ENT_ID, type=g.ENT_TYPE)
+    e = Entity(id=g.E_ID, type=g.E_TYPE)
     return(e)
 
 
@@ -17,7 +17,7 @@ def get_an_entity_with_context():
 # TESTS
 def test_create_id_type():
     e = get_an_entity()
-    assert e.id == g.ENT_ID and e.type == g.ENT_TYPE
+    assert e.id == g.E_ID and e.type == g.E_TYPE
 
 
 def test_set_context():
@@ -59,8 +59,8 @@ def test_simple_entity_to_ngsild():
     e = get_an_entity()
     ngsild_true = {
         '@context': None,
-        'id': 'uri:myentity:1',
-        'type': 'MY_ENTITY'
+        'id': 'uri:entity:1',
+        'type': 'ENTITY'
     }
     assert e.to_ngsild() == ngsild_true
 
@@ -72,8 +72,8 @@ def test_simple_entity_with_context_to_ngsild():
             'https://raw.githubusercontent.com/dummy/ngsild-api-data-models/'
             'main/jsonld-contexts/mydummy-contexts.jsonld'
         ],
-        'id': 'uri:myentity:1',
-        'type': 'MY_ENTITY'
+        'id': 'uri:entity:1',
+        'type': 'ENTITY'
     }
     assert e.to_ngsild() == ngsild_true
 
@@ -86,8 +86,8 @@ def test_entity_two_properties_to_nsgild():
             'https://raw.githubusercontent.com/dummy/ngsild-api-data-models/'
             'main/jsonld-contexts/mydummy-contexts.jsonld'
         ],
-        'id': 'uri:myentity:1',
-        'type': 'MY_ENTITY',
+        'id': 'uri:entity:1',
+        'type': 'ENTITY',
         'plant_health': {
             'type': 'Property',
             'value': 5,
@@ -113,8 +113,8 @@ def test_entity_one_property_one_sub_property_to_nsgild():
             'https://raw.githubusercontent.com/dummy/ngsild-api-data-models/'
             'main/jsonld-contexts/mydummy-contexts.jsonld'
         ],
-        'id': 'uri:myentity:1',
-        'type': 'MY_ENTITY',
+        'id': 'uri:entity:1',
+        'type': 'ENTITY',
         'plant_health': {
             'type': 'Property',
             'value': 5,
