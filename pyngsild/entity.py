@@ -14,7 +14,7 @@ class Entity():
     type: str
         Shall be the Entity Type Name
 
-    properties: Property
+    properties (optional): Property
         One or more Property object
 
     Return:

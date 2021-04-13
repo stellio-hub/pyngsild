@@ -11,18 +11,18 @@ class Property():
     value: str, numbers
         Value of the property
 
-    observed_at: str
+    observed_at (optional): str
         DateTime of the observation of the property, as str encoded using
         ISO 8601 'Extended Format'
 
-    unitCode: str
+    unitCode (optional): str
         Unit code of the measurement unit, encoded using the UN/CEFACT Common
         Codes for Units of Measurement
 
-    datasetid: URI
+    datasetid (optional): URI
         Instance of a property
 
-    properties: Property
+    properties (optional): Property
         One or more Property objects, the  property(ies) of this property
         instance
 
