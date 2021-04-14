@@ -91,12 +91,12 @@ def test_entity_two_properties_to_nsgild():
         'plant_health': {
             'type': 'Property',
             'value': 5,
-            'observedAt': g.OBSERVED_AT
+            'observed_at': g.OBSERVED_AT
         },
         'temperature': {
             'type': 'Property',
             'value': 37,
-            'observedAt': g.OBSERVED_AT,
+            'observed_at': g.OBSERVED_AT,
             'unitCode': 'CEL'
         }
     }
@@ -118,11 +118,11 @@ def test_entity_one_property_one_sub_property_to_nsgild():
         'plant_health': {
             'type': 'Property',
             'value': 5,
-            'observedAt': g.OBSERVED_AT,
+            'observed_at': g.OBSERVED_AT,
             'temperature': {
                 'type': 'Property',
                 'value': 37,
-                'observedAt': g.OBSERVED_AT,
+                'observed_at': g.OBSERVED_AT,
                 'unitCode': 'CEL'
             }
         }
