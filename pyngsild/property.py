@@ -20,7 +20,7 @@ class Property():
         Codes for Units of Measurement
 
     datasetid (optional): URI
-        Instance of a property
+        Identify an instance of a property
 
     properties (optional): Property
         One or more Property objects, the  property(ies) of this property
