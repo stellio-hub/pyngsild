@@ -11,7 +11,7 @@ class Relationship():
     name: str
         Name of the relationship
 
-    object: URI
+    object_: URI
         The target object of the relationship
 
     observed_at (optional): str
@@ -50,7 +50,8 @@ class Relationship():
 
     # Object representation
     def __repr__(self):
-        return(f'Relationship(name=\'{self.name}\', object_=\'{self.object_}\')')
+        return(f'Relationship(name=\'{self.name}' +
+               f'\', object_=\'{self.object_}\')')
 
     # name attribute
     @property
