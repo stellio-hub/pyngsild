@@ -150,7 +150,7 @@ class Property():
             }
         }
         if self._observed_at is not None:
-            ngsild[self._name]['observedAt'] = self._observed_at
+            ngsild[self._name]['observed_at'] = self._observed_at
         if self._unit_code is not None:
             ngsild[self._name]['unitCode'] = self._unit_code
         if self._datasetid is not None:
