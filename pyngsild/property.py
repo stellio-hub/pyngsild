@@ -38,9 +38,9 @@ class Property():
         self._unit_code = unit_code
         self._datasetid = datasetid
         if properties is not None:
-            self.add_properties(properties)
+            self._properties = properties
         else:
-            self.properties = None
+            self._properties = None
 
     # Object representation
     def __repr__(self):
@@ -91,10 +91,34 @@ class Property():
     def datasetid(self, datasetid):
         self._datasetid = datasetid
 
+    # properties attribute
+    @property
+    def properties(self):
+        return(self._properties)
+
+    @properties.setter
+    def properties(self, properties):
+        '''
+        Set (or re-set) properties. This is different from add properties
+        where property(ies) could be added to existing properties.
+        Here, previous properties are replaced by new properties.
+        '''
+        if properties is None:
+            self._properties = None
+        elif isinstance(properties, Property):
+            self._properties = [properties]
+        elif isinstance(properties, list):
+            if not any(not isinstance(p, Property) for p in properties):
+                self._properties = properties
+        else:
+            raise TypeError
+
     def add_properties(self, properties):
         '''
-        Adding property/properties to this instance of Property. A Property
-        could have 1 one more properties, there are stored as a list.
+        Adding property/properties to this instance of Property. The
+        property/ies are 'simply' added to the existing properties (if any).
+        property/ies could be complex property/ies (i.e. a property/ies having
+        property/ies)
 
         Parameters:
         -----------
@@ -109,24 +133,34 @@ class Property():
         ------
         TypeError
         '''
+        # Nothing to do if Parameters is None !
         if properties is None:
             pass
+
+        # Parameters is a single Property:
+        # when Relationship does not already have any property, the Property
+        # is added as a list. That will makes future addition of property/ies
+        # easier (i.e. the property is appended)
         elif isinstance(properties, Property):
-            if self.properties is None:
-                self.properties = [properties]
+            if self._properties is None:
+                self._properties = [properties]
             else:
-                self.properties.append(properties)
+                self._properties.append(properties)
+
+        # Parameters is a list:
+        # we ensure the list is made up of only Property object.
+        # When this is the case, we either SET self._properties (when
+        # self._properties is None) or we add each property to the existing
+        # properties.
         elif isinstance(properties, list):
             if not any(not isinstance(p, Property) for p in properties):
-                if self.properties is None:
-                    self.properties = properties
+                if self._properties is None:
+                    self._properties = properties
                 else:
                     for property_ in properties:
-                        self.properties.append(property_)
+                        self._properties.append(property_)
         else:
             raise TypeError
-
-        return
 
     def to_ngsild(self):
         '''
