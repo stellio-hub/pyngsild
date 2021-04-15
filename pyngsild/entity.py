@@ -1,4 +1,5 @@
 from pyngsild.property import Property
+from pyngsild.relationship import Relationship
 
 
 class Entity():
@@ -17,17 +18,25 @@ class Entity():
     properties (optional): Property
         One or more Property object
 
+    relationships (optional): Relationship
+        One or more Relationship object
+
     Return:
     -------
     Entity: an instance of this class
     '''
-    def __init__(self, id, type, properties=None):
+    def __init__(self, id, type, properties=None, relationships=None):
         self.id = id
         self.type = type
         if properties is not None:
             self.properties = properties
         else:
             self.properties = None
+        if relationships is not None:
+            self._relationships = relationships
+        else:
+            self._relationships = None
+
         self.at_context = None
 
     # Object representation
@@ -83,6 +92,29 @@ class Entity():
         else:
             raise TypeError
 
+    # relationships attribute
+    @property
+    def relationships(self):
+        return(self._relationships)
+
+    @relationships.setter
+    def relationships(self, relationships):
+        '''
+        Set (or re-set) relationships. This is different from add relationships
+        where relationship(s) could be added to existing relationships.
+        Here, previous relationships are replaced by new relationships.
+        '''
+        if relationships is None:
+            self._relationships = None
+        elif isinstance(relationships, Relationship):
+            self._relationships = [relationships]
+        elif isinstance(relationships, list):
+            if not any(not isinstance(r, Relationship) for r in relationships):
+                self._relationships = relationships
+        else:
+            raise TypeError
+
+    # Add property(ies) to this entity
     def add_properties(self, properties):
         '''
         Add property/properties to this instance of Entity. The property/ies
@@ -131,11 +163,63 @@ class Entity():
         else:
             raise TypeError
 
+    # Add relationship(s) to this entity
+    def add_relationships(self, relationships):
+        '''
+        Add relationship(s) to this instance of Entity. The relationship(s) are
+        'simply' added to the existing relationship(s) (if any). relationships
+        could be complex relationships (i.e. a relationship(s) having
+        relationships)
+
+        Parameters:
+        -----------
+        relationships: None, Relationship or list of Relationship
+            One or more relationships
+
+        Return:
+        -------
+        None
+
+        Raise:
+        ------
+        TypeError
+        '''
+        # Nothing to do if Parameters is None !
+        if relationships is None:
+            pass
+
+        # Parameters is a single Relationship:
+        # when Entity does not already have any relationship, the
+        # Relationship is added as a list. That will makes future addition of
+        # relationship(s) easier (i.e. the relationship is appended)
+        elif isinstance(relationships, Relationship):
+            if self._relationships is None:
+                self._relationships = [relationships]
+            else:
+                self._relationships.append(relationships)
+
+        # Parameters is a list:
+        # we ensure the list is made up of only Relationship object.
+        # When this is the case, we either SET self._relationships (when
+        # self._relationships is None) or we add each relationship to the
+        # existing relationships.
+        elif isinstance(relationships, list):
+            if not any(not isinstance(r, Relationship) for r in relationships):
+                if self._relationships is None:
+                    self._relationships = relationships
+                else:
+                    for relationship in relationships:
+                        self._relationships.append(relationship)
+        else:
+            raise TypeError
+
     def to_ngsild(self):
         '''
         Generate a NGSI-LD compliant representation of this instance of
         Entity. It includes all properties/sub-properties (and recursively,
-        sub-properties of sub-properties, etc.) and @Context.
+        sub-properties of sub-properties, etc.), all
+        relationships/sub-relationships (and recursively, sub-relationships of
+        sub-relationships, etc.) and @Context.
 
         Parameters:
         -----------
@@ -157,5 +241,11 @@ class Entity():
             for property_ in self.properties:
                 p_dict.update(property_.to_ngsild())
             ngsild.update(p_dict)
+
+        if self.relationships is not None:
+            r_dict = {}
+            for relationship in self.relationships:
+                r_dict.update(relationship.to_ngsild())
+            ngsild.update(r_dict)
 
         return(ngsild)
