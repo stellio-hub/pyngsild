@@ -264,11 +264,11 @@ class Property():
             }
         }
         if self._observed_at is not None:
-            ngsild[self._name]['observed_at'] = self._observed_at
+            ngsild[self._name]['observedAt'] = self._observed_at
         if self._unit_code is not None:
             ngsild[self._name]['unitCode'] = self._unit_code
         if self._datasetid is not None:
-            ngsild[self._name]['datasetid'] = self._datasetid
+            ngsild[self._name]['datasetId'] = self._datasetid
 
         if self.properties is not None:
             p_dict = {}
@@ -542,7 +542,7 @@ class Relationship():
         if self._observed_at is not None:
             ngsild[self._name]['observedAt'] = self._observed_at
         if self._datasetid is not None:
-            ngsild[self._name]['datasetid'] = self._datasetid
+            ngsild[self._name]['datasetId'] = self._datasetid
 
         if self.properties is not None:
             p_dict = {}
