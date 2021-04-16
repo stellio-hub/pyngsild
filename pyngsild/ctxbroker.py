@@ -1,6 +1,6 @@
 import requests
 from pyngsild.entity import Entity
-from pyngsild.property import Property
+from pyngsild.proprel import Property
 
 URL_ENTITIES = 'ngsi-ld/v1/entities/'
 

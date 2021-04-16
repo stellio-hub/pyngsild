@@ -1,5 +1,4 @@
-from pyngsild.property import Property
-from pyngsild.relationship import Relationship
+from pyngsild.proprel import Property, Relationship
 
 
 class Entity():
