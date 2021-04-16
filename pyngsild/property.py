@@ -1,3 +1,6 @@
+import pyngsild.relationship
+
+
 class Property():
     '''
     The Property class represent a Property object as defined by the NGSI-LD
@@ -31,7 +34,7 @@ class Property():
     Property: an instance of this class
     '''
     def __init__(self, name, value, observed_at=None, unit_code=None,
-                 datasetid=None, properties=None):
+                 datasetid=None, properties=None, relationships=None):
         self._name = name
         self._value = value
         self._observed_at = observed_at
@@ -41,6 +44,10 @@ class Property():
             self._properties = properties
         else:
             self._properties = None
+        if relationships is not None:
+            self._relationships = relationships
+        else:
+            self._relationships = None
 
     # Object representation
     def __repr__(self):
@@ -113,6 +120,30 @@ class Property():
         else:
             raise TypeError
 
+    # relationships attribute
+    @property
+    def relationships(self):
+        return(self._relationships)
+
+    @relationships.setter
+    def relationships(self, relationships):
+        '''
+        Set (or re-set) relationships. This is different from add relationships
+        where relationship(s) could be added to existing relationships.
+        Here, previous relationships are replaced by new relationships.
+        '''
+        if relationships is None:
+            self._relationships = None
+        elif isinstance(relationships, pyngsild.relationship.Relationship):
+            self._relationships = [relationships]
+        elif isinstance(relationships, list):
+            if not any(not isinstance(r, pyngsild.relationship.Relationship)
+                       for r in relationships):
+                self._relationships = relationships
+        else:
+            raise TypeError
+
+    # Add property(ies) to this instance of Property
     def add_properties(self, properties):
         '''
         Adding property/properties to this instance of Property. The
@@ -162,11 +193,63 @@ class Property():
         else:
             raise TypeError
 
+    # Add relationship(s) to this instance of Property
+    def add_relationships(self, relationships):
+        '''
+        Add relationship(s) to this instance of Relationship. The
+        relationship(s) are 'simply' added to the existing relationship(s)
+        (if any). relationships could be complex relationships (i.e.
+        a relationship(s) having relationships)
+
+        Parameters:
+        -----------
+        relationships: None, Relationship or list of Relationship
+            One or more relationships
+
+        Return:
+        -------
+        None
+
+        Raise:
+        ------
+        TypeError
+        '''
+        # Nothing to do if Parameters is None !
+        if relationships is None:
+            pass
+
+        # Parameters is a single Relationship:
+        # when Relationship does not already have any relationship, the
+        # Relationship is added as a list. That will makes future addition of
+        # relationship(s) easier (i.e. the relationship is appended)
+        elif isinstance(relationships, pyngsild.relationship.Relationship):
+            if self._relationships is None:
+                self._relationships = [relationships]
+            else:
+                self._relationships.append(relationships)
+
+        # Parameters is a list:
+        # we ensure the list is made up of only Relationship object.
+        # When this is the case, we either SET self._properties (when
+        # self._properties is None) or we add each property to the existing
+        # properties.
+        elif isinstance(relationships, list):
+            if not any(not isinstance(r, pyngsild.relationship.Relationship)
+                       for r in relationships):
+                if self._relationships is None:
+                    self._relationships = relationships
+                else:
+                    for relationship in relationships:
+                        self._relationships.append(relationship)
+        else:
+            raise TypeError
+
     def to_ngsild(self):
         '''
         Generate a NGSI-LD compliant representation of this instance of
         Property. It includes all sub-properties (and recursively,
-        sub-properties of sub-properties, etc.)
+        sub-properties of sub-properties, etc.) and all sub-relationships
+        (and recursively, sub-relationships of sub-relationships, etc.)
 
         Parameters:
         -----------
@@ -195,5 +278,11 @@ class Property():
             for property_ in self.properties:
                 p_dict.update(property_.to_ngsild())
             ngsild[self._name].update(p_dict)
+
+        if self.relationships is not None:
+            r_dict = {}
+            for relationship in self.relationships:
+                r_dict.update(relationship.to_ngsild())
+            ngsild[self._name].update(r_dict)
 
         return(ngsild)
