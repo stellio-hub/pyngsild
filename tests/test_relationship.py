@@ -26,7 +26,7 @@ def test_to_ngsild_one_relationship():
         'to_object_1': {
             'type': 'Relationship',
             'object': 'uri:object_1',
-            'observed_at': g.OBSERVED_AT
+            'observedAt': g.OBSERVED_AT
         }
     }
     assert r.to_ngsild() == ngsild_true
@@ -39,12 +39,12 @@ def test_to_ngsild_one_sub_relationship():
         'to_object_1': {
             'type': 'Relationship',
             'object': 'uri:object_1',
-            'observed_at': g.OBSERVED_AT,
+            'observedAt': g.OBSERVED_AT,
             'to_object_2': {
                 'type': 'Relationship',
                 'object': 'uri:object_2',
-                'observed_at': g.OBSERVED_AT,
-                'datasetid': 'r:dataset:2'
+                'observedAt': g.OBSERVED_AT,
+                'datasetId': 'r:dataset:2'
             }
         }
     }
@@ -58,12 +58,12 @@ def test_to_ngsild_relationship_property():
         'to_object_1': {
             'type': 'Relationship',
             'object': 'uri:object_1',
-            'observed_at': g.OBSERVED_AT,
+            'observedAt': g.OBSERVED_AT,
             'to_object_2': {
                 'type': 'Relationship',
                 'object': 'uri:object_2',
-                'observed_at': g.OBSERVED_AT,
-                'datasetid': 'r:dataset:2'
+                'observedAt': g.OBSERVED_AT,
+                'datasetId': 'r:dataset:2'
             }
         }
     }

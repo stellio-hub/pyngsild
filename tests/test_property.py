@@ -45,7 +45,7 @@ def test_to_ngsild_one_property():
         'plant_health': {
             'type': 'Property',
             'value': 5,
-            'observed_at': g.OBSERVED_AT
+            'observedAt': g.OBSERVED_AT
         }
     }
     assert p.to_ngsild() == ngsild_true
@@ -57,11 +57,11 @@ def test_to_ngsild_one_sub_property():
         'plant_health': {
             'type': 'Property',
             'value': 5,
-            'observed_at': g.OBSERVED_AT,
+            'observedAt': g.OBSERVED_AT,
             'temperature': {
                 'type': 'Property',
                 'value': 37,
-                'observed_at': g.OBSERVED_AT,
+                'observedAt': g.OBSERVED_AT,
                 'unitCode': 'CEL'
             }
         }
