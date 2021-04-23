@@ -1,69 +1,76 @@
 from pyngsild.proprel import Relationship
-from . import global_test_vars as g
+# from . import global_test_vars as g
+from . conftests import ConfTests
+
+
+conf = ConfTests()
 
 
 # TESTS
 def test_create_name_object():
-    r = Relationship(g.R_NAME, g.R_OBJECT)
-    assert r.name == g.R_NAME and r.object_ == g.R_OBJECT
+    r = Relationship(conf.R_NAME, conf.R_OBJECT)
+    assert r.name == conf.R_NAME and r.object_ == conf.R_OBJECT
 
 
 def test_create_name_object_observed_at():
-    r = Relationship(g.R_NAME, g.R_OBJECT, g.OBSERVED_AT)
-    assert r.name == g.R_NAME and r.object_ == g.R_OBJECT \
-        and r.observed_at == g.OBSERVED_AT
+    r = Relationship(conf.R_NAME, conf.R_OBJECT, conf.OBSERVED_AT)
+    assert r.name == conf.R_NAME and r.object_ == conf.R_OBJECT \
+        and r.observed_at == conf.OBSERVED_AT
 
 
 def test_create_all_args():
-    r = Relationship(g.R_NAME, g.R_OBJECT, g.OBSERVED_AT, g.R_DATASETID)
-    assert r.name == g.R_NAME and r.object_ == g.R_OBJECT \
-        and r.observed_at == g.OBSERVED_AT and r.datasetid == g.R_DATASETID
+    r = Relationship(conf.R_NAME, conf.R_OBJECT, conf.OBSERVED_AT,
+                     conf.R_DATASETID)
+    assert r.name == conf.R_NAME and r.object_ == conf.R_OBJECT \
+        and r.observed_at == conf.OBSERVED_AT \
+        and r.datasetid == conf.R_DATASETID
 
 
 def test_to_ngsild_one_relationship():
-    r = Relationship(g.R_NAME, g.R_OBJECT, g.OBSERVED_AT)
+    r1 = conf.rel_1()
     ngsild_true = {
         'to_object_1': {
             'type': 'Relationship',
             'object': 'uri:object_1',
-            'observedAt': g.OBSERVED_AT
+            'observedAt': conf.OBSERVED_AT
         }
     }
-    assert r.to_ngsild() == ngsild_true
+    assert r1.to_ngsild() == ngsild_true
 
 
 def test_to_ngsild_one_sub_relationship():
-    r = Relationship(g.R_NAME, g.R_OBJECT, g.OBSERVED_AT)
-    r.add_relationships(g.REL_2)
+    r1 = conf.rel_1()
+    r2 = conf.rel_2()
+    r1.add_relationships(r2)
     ngsild_true = {
         'to_object_1': {
             'type': 'Relationship',
             'object': 'uri:object_1',
-            'observedAt': g.OBSERVED_AT,
+            'observedAt': conf.OBSERVED_AT,
             'to_object_2': {
                 'type': 'Relationship',
                 'object': 'uri:object_2',
-                'observedAt': g.OBSERVED_AT,
+                'observedAt': conf.OBSERVED_AT,
                 'datasetId': 'r:dataset:2'
             }
         }
     }
-    assert r.to_ngsild() == ngsild_true
+    assert r1.to_ngsild() == ngsild_true
 
 
 def test_to_ngsild_relationship_property():
-    r = Relationship(g.R_NAME, g.R_OBJECT, g.OBSERVED_AT)
-    r.add_properties(g.PROP_1)
+    r = conf.rel_1()
+    p = conf.prop_1()
+    r.add_properties(p)
     ngsild_true = {
         'to_object_1': {
             'type': 'Relationship',
             'object': 'uri:object_1',
-            'observedAt': g.OBSERVED_AT,
-            'to_object_2': {
-                'type': 'Relationship',
-                'object': 'uri:object_2',
-                'observedAt': g.OBSERVED_AT,
-                'datasetId': 'r:dataset:2'
+            'observedAt': conf.OBSERVED_AT,
+            'plant_health': {
+                'type': 'Property',
+                'value': 5,
+                'observedAt': conf.OBSERVED_AT
             }
         }
     }

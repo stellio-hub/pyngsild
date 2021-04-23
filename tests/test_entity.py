@@ -1,62 +1,58 @@
-from pyngsild.entity import Entity
-from . import global_test_vars as g
+from . conftests import ConfTests
 
 
-# Some utilities functions
-def get_an_entity():
-    e = Entity(id=g.E_ID, type=g.E_TYPE)
-    return(e)
-
-
-def get_an_entity_with_context():
-    e = get_an_entity()
-    e.at_context = g.AT_CONTEXT
-    return(e)
+conf = ConfTests()
 
 
 # TESTS
 def test_create_id_type():
-    e = get_an_entity()
-    assert e.id == g.E_ID and e.type == g.E_TYPE
+    e = conf.ent_1()
+    assert e.id == conf.E_ID and e.type == conf.E_TYPE
 
 
 def test_set_context():
-    e = get_an_entity()
-    e.at_context = g.AT_CONTEXT
-    assert e.at_context == g.AT_CONTEXT
+    e = conf.ent_1()
+    e.at_context = conf.AT_CONTEXT
+    assert e.at_context == conf.AT_CONTEXT
 
 
 def test_set_one_property():
-    e = get_an_entity()
-    e.properties = g.PROP_1
+    e = conf.ent_1()
+    p = conf.prop_1()
+    e.properties = p
     # when set, a single property is set as a  list
     # hence assertion to [PROP_1]
-    assert e.properties == [g.PROP_1]
+    assert e.properties == [p]
 
 
 def test_add_first_property():
-    e = get_an_entity()
-    e.add_properties(g.PROP_1)
+    e = conf.ent_1()
+    p = conf.prop_1()
+    e.add_properties(p)
     # when added, a single property is added as a list
     # hence assertion to [PROP_1]
-    assert e.properties == [g.PROP_1]
+    assert e.properties == [p]
 
 
 def test_add_another_property():
-    e = get_an_entity()
-    e.add_properties(g.PROP_1)
-    e.add_properties(g.PROP_2)
-    assert e.properties == [g.PROP_1, g.PROP_2]
+    e = conf.ent_1()
+    p1 = conf.prop_1()
+    p2 = conf.prop_2()
+    e.add_properties(p1)
+    e.add_properties(p2)
+    assert e.properties == [p1, p2]
 
 
 def test_add_list_of_properties():
-    e = get_an_entity()
-    e.add_properties([g.PROP_1, g.PROP_2])
-    assert e.properties == [g.PROP_1, g.PROP_2]
+    e = conf.ent_1()
+    p1 = conf.prop_1()
+    p2 = conf.prop_2()
+    e.add_properties([p1, p2])
+    assert e.properties == [p1, p2]
 
 
 def test_simple_entity_to_ngsild():
-    e = get_an_entity()
+    e = conf.ent_1()
     ngsild_true = {
         '@context': None,
         'id': 'uri:entity:1',
@@ -66,7 +62,8 @@ def test_simple_entity_to_ngsild():
 
 
 def test_simple_entity_with_context_to_ngsild():
-    e = get_an_entity_with_context()
+    e = conf.ent_1()
+    e.at_context = conf.AT_CONTEXT
     ngsild_true = {
         '@context': [
             'https://raw.githubusercontent.com/dummy/ngsild-api-data-models/'
@@ -79,8 +76,9 @@ def test_simple_entity_with_context_to_ngsild():
 
 
 def test_entity_two_properties_to_nsgild():
-    e = get_an_entity_with_context()
-    e.add_properties([g.PROP_1, g.PROP_2])
+    e = conf.ent_1()
+    e.at_context = conf.AT_CONTEXT
+    e.add_properties([conf.prop_1(), conf.prop_2()])
     ngsild_true = {
         '@context': [
             'https://raw.githubusercontent.com/dummy/ngsild-api-data-models/'
@@ -91,12 +89,12 @@ def test_entity_two_properties_to_nsgild():
         'plant_health': {
             'type': 'Property',
             'value': 5,
-            'observedAt': g.OBSERVED_AT
+            'observedAt': conf.OBSERVED_AT
         },
         'temperature': {
             'type': 'Property',
             'value': 37,
-            'observedAt': g.OBSERVED_AT,
+            'observedAt': conf.OBSERVED_AT,
             'unitCode': 'CEL'
         }
     }
@@ -104,9 +102,10 @@ def test_entity_two_properties_to_nsgild():
 
 
 def test_entity_one_property_one_sub_property_to_nsgild():
-    e = get_an_entity_with_context()
-    p = g.PROP_1
-    p.add_properties(g.PROP_2)
+    e = conf.ent_1()
+    e.at_context = conf.AT_CONTEXT
+    p = conf.prop_1()
+    p.add_properties(conf.prop_2())
     e.add_properties(p)
     ngsild_true = {
         '@context': [
@@ -118,11 +117,11 @@ def test_entity_one_property_one_sub_property_to_nsgild():
         'plant_health': {
             'type': 'Property',
             'value': 5,
-            'observedAt': g.OBSERVED_AT,
+            'observedAt': conf.OBSERVED_AT,
             'temperature': {
                 'type': 'Property',
                 'value': 37,
-                'observedAt': g.OBSERVED_AT,
+                'observedAt': conf.OBSERVED_AT,
                 'unitCode': 'CEL'
             }
         }

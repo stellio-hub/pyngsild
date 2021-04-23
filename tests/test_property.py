@@ -1,69 +1,64 @@
 from pyngsild.proprel import Property
-from . import global_test_vars as g
+from . conftests import ConfTests
 
 
-# Some utilities functions
-def get_a_property():
-    return(Property(name='plant_health',
-                    value=5, observed_at=g.OBSERVED_AT))
-
-
-def get_a_sub_property():
-    return(Property(name='temperature',
-                    value=37, observed_at=g.OBSERVED_AT, unit_code='CEL'))
+conf = ConfTests()
 
 
 # TESTS
 def test_create_name_value():
-    p = Property(g.P_NAME, g.P_VALUE)
-    assert p.name == g.P_NAME and p.value == g.P_VALUE
+    p = Property(conf.P_NAME, conf.P_VALUE)
+    assert p.name == conf.P_NAME and p.value == conf.P_VALUE
 
 
 def test_create_name_value_observed_at():
-    p = Property(g.P_NAME, g.P_VALUE, g.OBSERVED_AT)
-    assert p.name == g.P_NAME and p.value == g.P_VALUE \
-        and p.observed_at == g.OBSERVED_AT
+    p = Property(conf.P_NAME, conf.P_VALUE, conf.OBSERVED_AT)
+    assert p.name == conf.P_NAME and p.value == conf.P_VALUE \
+        and p.observed_at == conf.OBSERVED_AT
 
 
 def test_create_name_value_observed_unit_code():
-    p = Property(g.P_NAME, g.P_VALUE, g.OBSERVED_AT, g.P_UNIT_CODE)
-    assert p.name == g.P_NAME and p.value == g.P_VALUE \
-        and p.observed_at == g.OBSERVED_AT and p.unit_code == g.P_UNIT_CODE
+    p = Property(conf.P_NAME, conf.P_VALUE, conf.OBSERVED_AT, conf.P_UNIT_CODE)
+    assert p.name == conf.P_NAME and p.value == conf.P_VALUE \
+        and p.observed_at == conf.OBSERVED_AT \
+        and p.unit_code == conf.P_UNIT_CODE
 
 
 def test_create_all_args():
-    p = Property(g.P_NAME, g.P_VALUE, g.OBSERVED_AT,
-                 g.P_UNIT_CODE, g.P_DATASETID)
-    assert p.name == g.P_NAME and p.value == g.P_VALUE \
-        and p.observed_at == g.OBSERVED_AT \
-        and p.unit_code == g.P_UNIT_CODE and p._datasetid == g.P_DATASETID
+    p = Property(conf.P_NAME, conf.P_VALUE, conf.OBSERVED_AT,
+                 conf.P_UNIT_CODE, conf.P_DATASETID)
+    assert p.name == conf.P_NAME and p.value == conf.P_VALUE \
+        and p.observed_at == conf.OBSERVED_AT \
+        and p.unit_code == conf.P_UNIT_CODE \
+        and p._datasetid == conf.P_DATASETID
 
 
 def test_to_ngsild_one_property():
-    p = g.PROP_1
+    p = conf.prop_1()
     ngsild_true = {
         'plant_health': {
             'type': 'Property',
             'value': 5,
-            'observedAt': g.OBSERVED_AT
+            'observedAt': conf.OBSERVED_AT
         }
     }
     assert p.to_ngsild() == ngsild_true
 
 
 def test_to_ngsild_one_sub_property():
-    g.PROP_1.add_properties(g.PROP_2)
+    p = conf.prop_1()
+    p.add_properties(conf.prop_2())
     ngsild_true = {
         'plant_health': {
             'type': 'Property',
             'value': 5,
-            'observedAt': g.OBSERVED_AT,
+            'observedAt': conf.OBSERVED_AT,
             'temperature': {
                 'type': 'Property',
                 'value': 37,
-                'observedAt': g.OBSERVED_AT,
+                'observedAt': conf.OBSERVED_AT,
                 'unitCode': 'CEL'
             }
         }
     }
-    assert g.PROP_1.to_ngsild() == ngsild_true
+    assert p.to_ngsild() == ngsild_true
