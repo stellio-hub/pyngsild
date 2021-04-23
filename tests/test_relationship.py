@@ -1,4 +1,4 @@
-from pyngsild.relationship import Relationship
+from pyngsild.proprel import Relationship
 from . import global_test_vars as g
 
 

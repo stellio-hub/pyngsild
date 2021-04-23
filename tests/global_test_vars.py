@@ -1,5 +1,5 @@
-from pyngsild.property import Property
-from pyngsild.relationship import Relationship
+from pyngsild.proprel import Property
+from pyngsild.proprel import Relationship
 from datetime import datetime
 import pytz
 

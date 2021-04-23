@@ -1,4 +1,4 @@
-from pyngsild.property import Property
+from pyngsild.proprel import Property
 from . import global_test_vars as g
 
 
