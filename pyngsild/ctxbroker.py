@@ -57,6 +57,25 @@ class ContextBroker():
     def auth_token(self, auth_token):
         self._auth_token = auth_token
 
+    def query_entities(self, query_params):
+        '''
+        Query entities from the Context Broker
+
+        Parameters:
+        -----------
+        query_params: dict
+            Query parameters
+
+        Return:
+        -------
+        r: requests.models.Response
+            the response from the Context Broker.
+            if the request is successful, entities are accessible as JSON at r.json()
+        '''
+        url = self.cb_host + URL_ENTITIES
+        r = requests.get(url, headers=self.get_headers, params=query_params)
+        return(r)
+
     def get_entity(self, id):
         '''
         Get an entity by id from the Context Broker
