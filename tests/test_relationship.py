@@ -1,5 +1,4 @@
 from pyngsild.proprel import Relationship
-# from . import global_test_vars as g
 from . conftests import ConfTests
 
 
