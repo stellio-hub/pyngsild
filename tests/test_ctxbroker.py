@@ -3,7 +3,10 @@ from pyngsild.ctxbroker import ContextBroker
 from pyngsild.entity import Entity
 
 CONTEXT_BROKER_URL = "http://localhost:5000/"
-ACCESS_TOKEN = "token"
+AUTH_SERVER_URL = "http://localhost:5000/auth/token"
+CLIENT_ID = "client_id"
+CLIENT_SECRET = "client_secret"
+GRANT_TYPE = "client_credentials"
 QUERY_ENTITIES_EXPECTATION = [
     Entity('urn:ngsi-ld:Vehicle:01231', 'Vehicle').to_ngsild(),
     Entity('urn:ngsi-ld:Vehicle:01232', 'Vehicle').to_ngsild()
@@ -13,13 +16,18 @@ QUERY_ENTITIES_EXPECTATION = [
 class TestContextBroker:
 
     def set_up(self):
-        self.context_broker = ContextBroker(CONTEXT_BROKER_URL, ACCESS_TOKEN)
+        self.context_broker = ContextBroker(CONTEXT_BROKER_URL, AUTH_SERVER_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE)
 
+    @pytest.mark.server(
+        url='/auth/token',
+        method='POST',
+        response={"access_token": "token"}
+    )
     @pytest.mark.server(
         url='/ngsi-ld/v1/entities/',
         method='GET',
         headers={'Authorization': 'Bearer token'},
-        response=QUERY_ENTITIES_EXPECTATION,
+        response=QUERY_ENTITIES_EXPECTATION
     )
     def test_query_entities(self):
         self.set_up()

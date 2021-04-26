@@ -1,6 +1,7 @@
 import requests
 from pyngsild.entity import Entity
 from pyngsild.proprel import Property
+from pyngsild.utils.auth_utils import get_token
 
 URL_ENTITIES = 'ngsi-ld/v1/entities/'
 
@@ -22,9 +23,12 @@ class ContextBroker():
     ContextBroker: an instance of a Context Broker
     '''
 
-    def __init__(self, cb_host, auth_token):
+    def __init__(self, cb_host, auth_server_host, client_id, client_secret, grant_type):
+        self._auth_token = get_token(auth_server_host, client_id, client_secret, grant_type)
+        if self._auth_token is None:
+            return
+
         self._cb_host = cb_host
-        self._auth_token = auth_token
         self.post_headers = {
             'Authorization': 'Bearer ' + self.auth_token,
             'Content-Type': 'application/ld+json'
@@ -74,7 +78,7 @@ class ContextBroker():
         '''
         url = self.cb_host + URL_ENTITIES
         r = requests.get(url, headers=self.get_headers, params=query_params)
-        return(r)
+        return r
 
     def get_entity(self, id):
         '''
