@@ -3,10 +3,6 @@ from pyngsild.ctxbroker import ContextBroker
 from pyngsild.entity import Entity
 
 CONTEXT_BROKER_URL = "http://localhost:5000/"
-AUTH_SERVER_URL = "http://localhost:5000/auth/token"
-CLIENT_ID = "client_id"
-CLIENT_SECRET = "client_secret"
-GRANT_TYPE = "client_credentials"
 QUERY_ENTITIES_EXPECTATION = [
     Entity('urn:ngsi-ld:Vehicle:01231', 'Vehicle').to_ngsild(),
     Entity('urn:ngsi-ld:Vehicle:01232', 'Vehicle').to_ngsild()
