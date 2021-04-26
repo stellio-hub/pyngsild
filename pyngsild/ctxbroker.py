@@ -49,12 +49,13 @@ class ContextBroker:
 
         Return:
         -------
-        r: requests.models.Response
+        response: requests.models.Response
             the response from the Context Broker.
             if the request is successful, entities are accessible as JSON at r.json()
         """
-        request = requests.get(url=self.cb_host + URL_ENTITIES, headers=request_headers, params=query_params)
-        return request
+
+        response = requests.get(url=self.cb_host + URL_ENTITIES, headers=request_headers, params=query_params)
+        return response
 
     def get_entity(self, request_headers, entity_id):
         """
@@ -70,13 +71,13 @@ class ContextBroker:
 
         Return:
         -------
-        r: requests.models.Response
+        response: requests.models.Response
             the response from the Context Broker. if the request is successful,
             the entity is accessible as JSON at r.json()
         """
 
-        request = requests.get(url=self.cb_host + URL_ENTITIES + entity_id, headers=request_headers)
-        return request
+        response = requests.get(url=self.cb_host + URL_ENTITIES + entity_id, headers=request_headers)
+        return response
 
     def create_entity(self, request_headers, entity):
         """
@@ -92,7 +93,7 @@ class ContextBroker:
 
         Return:
         -------
-        r: requests.models.Response
+        response: requests.models.Response
 
         Raise:
         ------
@@ -102,8 +103,8 @@ class ContextBroker:
             raise TypeError
         else:
             ngsild_entity = entity.to_ngsild()
-            request = requests.post(url=self.cb_host + URL_ENTITIES, json=ngsild_entity, headers=request_headers)
-        return request
+            response = requests.post(url=self.cb_host + URL_ENTITIES, json=ngsild_entity, headers=request_headers)
+        return response
 
     def update_property(self, request_headers, entity, property_):
         """
@@ -123,7 +124,7 @@ class ContextBroker:
 
         Return:
         -------
-        r: requests.models.Response
+        response: requests.models.Response
 
         Raise:
         ------
@@ -136,12 +137,12 @@ class ContextBroker:
         else:
             ngsild_property = property_.to_ngsild()
             ngsild_property['@context'] = entity.at_context
-            request = requests.patch(
+            response = requests.patch(
                 url=self.cb_host + URL_ENTITIES + entity.id + '/attrs',
                 json=ngsild_property,
                 headers=request_headers
             )
-        return request
+        return response
 
     def delete_entity(self, request_headers, entity_id):
         """
@@ -157,8 +158,8 @@ class ContextBroker:
 
         Return:
         -------
-        r: requests.models.Response
+        response: requests.models.Response
         """
 
-        request = requests.delete(url=self.cb_host + URL_ENTITIES + entity_id, headers=request_headers)
-        return request
+        response = requests.delete(url=self.cb_host + URL_ENTITIES + entity_id, headers=request_headers)
+        return response
