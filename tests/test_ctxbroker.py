@@ -16,13 +16,8 @@ QUERY_ENTITIES_EXPECTATION = [
 class TestContextBroker:
 
     def set_up(self):
-        self.context_broker = ContextBroker(CONTEXT_BROKER_URL, AUTH_SERVER_URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE)
+        self.context_broker = ContextBroker(CONTEXT_BROKER_URL)
 
-    @pytest.mark.server(
-        url='/auth/token',
-        method='POST',
-        response={"access_token": "token"}
-    )
     @pytest.mark.server(
         url='/ngsi-ld/v1/entities/',
         method='GET',
@@ -31,6 +26,9 @@ class TestContextBroker:
     )
     def test_query_entities(self):
         self.set_up()
-        response = self.context_broker.query_entities({'type': "Vehicle", 'idPattern': '^urn:ngsi-ld:Vehicle:.*'})
+        response = self.context_broker.query_entities(
+            {'Authorization': 'Bearer token'},
+            {'type': "Vehicle", 'idPattern': '^urn:ngsi-ld:Vehicle:.*'}
+        )
         assert response.status_code == 200
         assert response.json() == QUERY_ENTITIES_EXPECTATION
