@@ -24,7 +24,7 @@ class ContextBroker:
 
     # Object representation
     def __repr__(self):
-        return f'ContextBroker(cb_host=\'{self.cb_host})'
+        return f'ContextBroker(cb_host=\'{self.cb_host}\')'
 
     # cb_host attribute
     @property
@@ -51,10 +51,12 @@ class ContextBroker:
         -------
         response: requests.models.Response
             the response from the Context Broker.
-            if the request is successful, entities are accessible as JSON at r.json()
+            if the request is successful, entities are
+            accessible as JSON at r.json()
         """
 
-        response = requests.get(url=self.cb_host + URL_ENTITIES, headers=request_headers, params=query_params)
+        response = requests.get(url=self.cb_host + URL_ENTITIES,
+                                headers=request_headers, params=query_params)
         return response
 
     def get_entity(self, request_headers, entity_id):
@@ -76,7 +78,8 @@ class ContextBroker:
             the entity is accessible as JSON at r.json()
         """
 
-        response = requests.get(url=self.cb_host + URL_ENTITIES + entity_id, headers=request_headers)
+        response = requests.get(url=self.cb_host + URL_ENTITIES + entity_id,
+                                headers=request_headers)
         return response
 
     def create_entity(self, request_headers, entity):
@@ -103,7 +106,9 @@ class ContextBroker:
             raise TypeError
         else:
             ngsild_entity = entity.to_ngsild()
-            response = requests.post(url=self.cb_host + URL_ENTITIES, json=ngsild_entity, headers=request_headers)
+            response = requests.post(url=self.cb_host + URL_ENTITIES,
+                                     json=ngsild_entity,
+                                     headers=request_headers)
         return response
 
     def update_property(self, request_headers, entity, property_):
@@ -161,5 +166,6 @@ class ContextBroker:
         response: requests.models.Response
         """
 
-        response = requests.delete(url=self.cb_host + URL_ENTITIES + entity_id, headers=request_headers)
+        response = requests.delete(url=self.cb_host + URL_ENTITIES
+                                   + entity_id, headers=request_headers)
         return response
