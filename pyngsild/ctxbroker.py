@@ -5,8 +5,8 @@ from pyngsild.proprel import Property
 URL_ENTITIES = 'ngsi-ld/v1/entities/'
 
 
-class ContextBroker():
-    '''
+class ContextBroker:
+    """
     The ContextBroker class represents a connection to a NGSI-LD Context Broker
 
     Parameters:
@@ -14,99 +14,107 @@ class ContextBroker():
     cb_host: HTTP URL
         Hostname of the Context Broker, e.g.: http://myctxbroker.com/
 
-    auth_token: str
-        authorisation token for connecting to the Context Broker
-
     Return:
     -------
     ContextBroker: an instance of a Context Broker
-    '''
+    """
 
-    def __init__(self, cb_host, auth_token):
+    def __init__(self, cb_host):
         self._cb_host = cb_host
-        self._auth_token = auth_token
-        self.post_headers = {
-            'Authorization': 'Bearer ' + self.auth_token,
-            'Content-Type': 'application/ld+json'
-        }
-        self.get_headers = {
-            'Authorization': 'Bearer ' + self.auth_token,
-            'Content-Type': 'application/ld+json'
-        }
 
     # Object representation
     def __repr__(self):
-        return(f'ContextBroker(cb_host=\'{self.cb_host}' +
-               f'\', auth_token=\'{self.auth_token}\')')
+        return f'ContextBroker(cb_host=\'{self.cb_host})'
 
     # cb_host attribute
     @property
     def cb_host(self):
-        return(self._cb_host)
+        return self._cb_host
 
     @cb_host.setter
     def cb_host(self, cb_host):
         self._cb_host = cb_host
 
-    # auth_token attribute
-    @property
-    def auth_token(self):
-        return(self._auth_token)
+    def query_entities(self, request_headers, query_params):
+        """
+        Query entities from the Context Broker
 
-    @auth_token.setter
-    def auth_token(self, auth_token):
-        self._auth_token = auth_token
+        Parameters:
+        -----------
+        request_headers: dict
+            Request Headers
 
-    def get_entity(self, id):
-        '''
+        query_params: dict
+            Query Parameters
+
+        Return:
+        -------
+        response: requests.models.Response
+            the response from the Context Broker.
+            if the request is successful, entities are accessible as JSON at r.json()
+        """
+
+        response = requests.get(url=self.cb_host + URL_ENTITIES, headers=request_headers, params=query_params)
+        return response
+
+    def get_entity(self, request_headers, entity_id):
+        """
         Get an entity by id from the Context Broker
 
         Parameters:
         -----------
-        id: URI
+        request_headers: dict
+            Request Headers
+
+        entity_id: URI
             Identifier of the entity
 
         Return:
         -------
-        r: requests.models.Response
+        response: requests.models.Response
             the response from the Context Broker. if the request is successful,
             the entity is accessible as JSON at r.json()
-        '''
-        url = self.cb_host + URL_ENTITIES + id
-        r = requests.get(url, headers=self.get_headers)
-        return(r)
+        """
 
-    def create_entity(self, entity):
-        '''
+        response = requests.get(url=self.cb_host + URL_ENTITIES + entity_id, headers=request_headers)
+        return response
+
+    def create_entity(self, request_headers, entity):
+        """
         Create an entity by id into the Context Broker
 
         Parameters:
         -----------
+        request_headers: dict
+            Request Headers
+
         entity: Entity
             An instance of Entity
 
         Return:
         -------
-        r: requests.models.Response
+        response: requests.models.Response
 
         Raise:
         ------
         TypeError
-        '''
+        """
         if not isinstance(entity, Entity):
             raise TypeError
         else:
-            url = self.cb_host + URL_ENTITIES
-            ngsild = entity.to_ngsild()
-            r = requests.post(url, json=ngsild, headers=self.post_headers)
-        return(r)
+            ngsild_entity = entity.to_ngsild()
+            response = requests.post(url=self.cb_host + URL_ENTITIES, json=ngsild_entity, headers=request_headers)
+        return response
 
-    def update_property(self, entity, property_):
-        '''
+    def update_property(self, request_headers, entity, property_):
+        """
         Update a property of an entity into the Context Broker
 
         Parameters:
         -----------
+        request_headers: dict
+            Request Headers
+
         entity: Entity
             An instance of Entity, the entity for which the property will be
             updated
@@ -116,36 +124,42 @@ class ContextBroker():
 
         Return:
         -------
-        r: requests.models.Response
+        response: requests.models.Response
 
         Raise:
         ------
         TypeError
-        '''
+        """
         if not isinstance(entity, Entity):
             raise TypeError
         if not isinstance(property_, Property):
             raise TypeError
         else:
-            url = self.cb_host + URL_ENTITIES + entity.id + '/attrs'
-            ngsild = property_.to_ngsild()
-            ngsild['@context'] = entity.at_context
-            r = requests.patch(url, json=ngsild, headers=self.post_headers)
-        return(r)
+            ngsild_property = property_.to_ngsild()
+            ngsild_property['@context'] = entity.at_context
+            response = requests.patch(
+                url=self.cb_host + URL_ENTITIES + entity.id + '/attrs',
+                json=ngsild_property,
+                headers=request_headers
+            )
+        return response
 
-    def delete_entity(self, entity_id):
-        '''
+    def delete_entity(self, request_headers, entity_id):
+        """
         Delete an entity by id from the Context Broker
 
         Parameters:
         -----------
+        request_headers: dict
+            Request Headers
+
         entity_id: URI
             The unique identifier of the entity
 
         Return:
         -------
-        r: requests.models.Response
-        '''
-        url = self.cb_host + URL_ENTITIES + entity_id
-        r = requests.delete(url, headers=self.get_headers)
-        return(r)
+        response: requests.models.Response
+        """
+
+        response = requests.delete(url=self.cb_host + URL_ENTITIES + entity_id, headers=request_headers)
+        return response
