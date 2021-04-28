@@ -24,7 +24,7 @@ class ContextBroker:
 
     # Object representation
     def __repr__(self):
-        return f'ContextBroker(cb_host=\'{self.cb_host}'
+        return f'ContextBroker(cb_host=\'{self.cb_host})'
 
     # cb_host attribute
     @property
