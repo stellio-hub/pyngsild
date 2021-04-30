@@ -15,6 +15,7 @@ Then, a **ContextBroker** Class implements the NGSI-LD operations (e.g. Create E
 * *Retrieve Entity*,
 * *Query Entities*
 ## How To
+#
 ### Create an entity
 A simple entity can be created with:
 ```python
@@ -26,6 +27,7 @@ Then, the NGSI-LD context of this entity can be set with:
 ```python
 entity_1.at_context = 'https://my/context'
 ```
+#
 ### Create a property
 A simple property could be created with:
 ```python
@@ -43,6 +45,7 @@ It is then easy to add a property to an entity:
 ```python
 entity_1.add(property_1)
 ```
+#
 ### Create a relationship
 It really follows the same principle as **Property** (with obviously different type of attributes). For instance, to create relationship:
 ```python
@@ -66,6 +69,7 @@ The NGSI-LD json representation of this entity can be simply displayed with:
 ```python
 print(entity_1.to_ngsild())
 ```
+#
 ### Context Broker
 Operations to a NGSI-LD Context Broker are supported through the ContextBroker Class. For instance, creating an entity into a Context Broker is simply done with:
 ```python
