@@ -80,4 +80,8 @@ headers = {'Authorization': 'Bearer the_token',
            'Content-Type': 'application/ld+json'}
 response = ctxb.create_entity(request_headers=headers, entity=entity_1)
 ```
-
+#
+## Installation
+```bash
+pip install git+https://{token}@github.com/stellio-hub/pyngsild
+```
