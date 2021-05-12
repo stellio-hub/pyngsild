@@ -15,7 +15,6 @@ Then, a **ContextBroker** Class implements the NGSI-LD operations (e.g. Create E
 * *Retrieve Entity*,
 * *Query Entities*
 ## How To
-#
 ### Create an entity
 A simple entity can be created with:
 ```python
@@ -80,7 +79,6 @@ headers = {'Authorization': 'Bearer the_token',
            'Content-Type': 'application/ld+json'}
 response = ctxb.create_entity(request_headers=headers, entity=entity_1)
 ```
-#
 ## Installation
 ```bash
 pip install git+https://{token}@github.com/stellio-hub/pyngsild
