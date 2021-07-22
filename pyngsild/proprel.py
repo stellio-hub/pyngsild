@@ -103,6 +103,11 @@ class Property():
     observed_at (optional): str, datetime object
         DateTime of the observation of the property either as str encoded using
         ISO 8601 'Extended Format', or as a datetime object
+        When a datetime object is used, if the datetime object is naive (i.e.
+        does not have timezone information), the system local timezone
+        is used to construct an aware datetime object.
+        Datetime objects are then transformed into a str, before being assigned
+        to the observed_at attribute
 
     unitCode (optional): str
         Unit code of the measurement unit, encoded using the UN/CEFACT Common
