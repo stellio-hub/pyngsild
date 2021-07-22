@@ -55,6 +55,14 @@ def test_create_property_datetime_str():
         and p.observed_at == conf.NAIVE_DATETIME_STR
 
 
+# Update property with observed_at
+def test_update_property_datetime_naive():
+    p = Property(conf.P_NAME, conf.P_VALUE)
+    p.observed_at = conf.NAIVE_DATETIME
+    assert p.name == conf.P_NAME and p.value == conf.P_VALUE \
+        and p.observed_at == conf.NAIVE_DATETIME_STR
+
+
 # Create property with observed_at being of other types than str and datetime
 def test_create_property_datetime_incorrect_type():
     with pytest.raises(ValueError):
