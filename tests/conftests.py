@@ -1,7 +1,7 @@
 from pyngsild.entity import Entity
 from pyngsild.proprel import Property
 from pyngsild.proprel import Relationship
-from datetime import datetime
+from datetime import datetime, timezone
 import pytz
 
 
@@ -24,6 +24,12 @@ class ConfTests():
             'rel=http://www.w3.org/ns/json-ld#context; type=application/json'
         self._OBSERVED_AT =\
             timezone_France.localize(datetime.now()).isoformat()
+        self.NAIVE_DATETIME =\
+            datetime(2021, 7, 22, 10, 11, 12, 13, tzinfo=None)
+        self.NAIVE_DATETIME_STR = '2021-07-22T10:11:12.000013+02:00'
+        self.AWARE_DATETIME =\
+            datetime(2021, 7, 22, 10, 11, 12, 13, tzinfo=timezone.utc)
+        self.AWARE_DATETIME_STR = '2021-07-22T10:11:12.000013+00:00'
         self._E_ID = 'uri:entity:1'
         self._E_TYPE = 'ENTITY'
         self._P_NAME = 'a_property'
