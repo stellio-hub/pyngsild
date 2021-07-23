@@ -123,6 +123,10 @@ class Property():
     Return:
     -------
     Property: an instance of this class
+
+    Raise:
+    ------
+    TypeError
     '''
     def __init__(self, name, value, observed_at=None, unit_code=None,
                  datasetid=None, properties=None, relationships=None):
@@ -177,7 +181,7 @@ class Property():
         elif isinstance(observed_at, str):
             self._observed_at = observed_at
         else:
-            raise ValueError(
+            raise TypeError(
                 'observed_at is expecting to be of type datetime or str')
 
     # unit_code attribute
