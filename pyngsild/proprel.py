@@ -405,9 +405,14 @@ class Relationship():
     object_: URI
         The target object of the relationship
 
-    observed_at (optional): str
-        DateTime of the observation of the relationship, as str encoded using
-        ISO 8601 'Extended Format'
+    observed_at (optional): str, datetime object
+        DateTime of the observation of the relationship either as str encoded
+        using ISO 8601 'Extended Format', or as a datetime object
+        When a datetime object is used, if the datetime object is naive (i.e.
+        does not have timezone information), the system local timezone
+        is used to construct an aware datetime object.
+        Datetime objects are then transformed into a str, before being assigned
+        to the observed_at attribute
 
     datasetid (optional): URI
         Identify an instance of a relationship
@@ -428,7 +433,8 @@ class Relationship():
         self._name = name
         self._type = 'Relationship'
         self._object_ = object_
-        self._observed_at = observed_at
+        # calling observed_at setter from __init__
+        self._observed_at = self.observed_at = observed_at
         self._datasetid = datasetid
         if properties is not None:
             self._properties = properties
@@ -469,7 +475,15 @@ class Relationship():
 
     @observed_at.setter
     def observed_at(self, observed_at):
-        self._observed_at = observed_at
+        if observed_at is None:
+            self._observed_at = None
+        elif isinstance(observed_at, datetime):
+            self._observed_at = as_isoformat(observed_at)
+        elif isinstance(observed_at, str):
+            self._observed_at = observed_at
+        else:
+            raise TypeError(
+                'observed_at is expecting to be of type datetime or str')
 
     # datasetid attribute
     @property
