@@ -1,4 +1,4 @@
-from pyngsild.proprel import Property, is_dt_aware
+from pyngsild.proprel import Property, Relationship, is_dt_aware
 from pyngsild.proprel import as_isoformat
 from datetime import datetime, timezone
 import pytest
@@ -65,5 +65,23 @@ def test_update_property_datetime_naive():
 
 # Create property with observed_at being of other types than str and datetime
 def test_create_property_datetime_incorrect_type():
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         Property(conf.P_NAME, conf.P_VALUE, 1234)
+
+
+# TESTS for Relationship class
+# (limited tests as code identical to Property class)
+
+# Create relationship with observed_at as datetime object
+def test_create_relationship_datetime_naive():
+    r = Relationship(conf.R_NAME, conf.R_OBJECT, conf.NAIVE_DATETIME)
+    assert r.name == conf.R_NAME and r.object_ == conf.R_OBJECT \
+        and r.observed_at == conf.NAIVE_DATETIME_STR
+
+
+# Update relationship with observed_at
+def test_update_relationship_datetime_aware():
+    r = Relationship(conf.R_NAME, conf.R_OBJECT)
+    r.observed_at = conf.AWARE_DATETIME
+    assert r.name == conf.R_NAME and r.object_ == conf.R_OBJECT \
+        and r.observed_at == conf.AWARE_DATETIME_STR
