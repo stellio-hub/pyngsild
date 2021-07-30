@@ -1,3 +1,92 @@
+'''This module define the Property and Relationship class.
+
+The Property class allows to create an NGSI-LD property. As per NGSI-LD
+specification, a property could itself contains one or more properties.
+
+    Typical usage examples:
+
+    prop1 = Property(name='uv_index', value=10)
+    prop2 = Property(name='temperature', value=15, unitCode='CEL')
+
+The Relationship class allows to create an NGSI-LD relationship. As per NGSI-LD
+specification, similarly to Property, a relationship could itself contains one
+or more relationships.
+
+    Typical usage examples:
+
+    rel1 = Relationship(name='hasObjectOne', object_='uri:of:ObjectOne')
+'''
+from tzlocal import get_localzone
+from datetime import datetime
+
+
+def is_dt_aware(dt):
+    '''Evaluates if a datetime object is aware
+
+    An aware datetime object can locate itself relative to other aware objects
+    (such datetime object typically includes time zone information).
+    
+    A datetime object dt is aware if:
+        dt.tzinfo is not None
+        dt.tzinfo.utcoffset(dt) does not return None
+    
+    Args:
+    -----
+    dt: datetime
+        the datetime object for which to test awareness
+
+    Return:
+    -------
+    False: The datetime object is not aware
+    True : The datetime object is aware
+    '''
+    if dt.tzinfo is not None:
+        if dt.tzinfo.utcoffset(dt) is not None:
+            return(True)
+    return(False)
+
+
+def as_isoformat(dt):
+    '''Transforms a datetime object into a string
+
+    When the datetime object is aware, a direct transformation to a string in
+    isoformat is performed.
+
+    When a datetime object is naive, the local zone (of the system running the
+    pyngsild package!) is retrieved, the datetime object is then transformed to
+    an aware datetime object using this local zone, and finally transformed to
+    a string in isoformat.
+
+        As an example a datetime object:
+
+            datetime.datetime(2021, 7, 21, 13, 23, 54, 78099,
+                              tzinfo=datetime.timezone.utc)
+
+        Will be transformed into the string:
+
+            '2021-07-21T13:23:54.078099+00:00'
+    
+    Args:
+    -----
+    dt: datetime
+        the datetime object to transform into isoformat
+
+    Return:
+    -------
+    str_dt: str
+        the datetime object transformed an isoformatted string
+    '''
+    if is_dt_aware(dt):
+        # This datetime object is Aware
+        str_dt = dt.isoformat()
+    else:
+        # This datetime object is Naive
+        local_tz = get_localzone()
+        local_dt = local_tz.localize(dt)
+        str_dt = local_dt.isoformat()
+    return(str_dt)
+
+
 class Property():
     '''
     The Property class represent a Property object as defined by the NGSI-LD
@@ -11,9 +100,14 @@ class Property():
     value: str, numbers
         Value of the property
 
-    observed_at (optional): str
-        DateTime of the observation of the property, as str encoded using
-        ISO 8601 'Extended Format'
+    observed_at (optional): str, datetime object
+        DateTime of the observation of the property either as str encoded using
+        ISO 8601 'Extended Format', or as a datetime object
+        When a datetime object is used, if the datetime object is naive (i.e.
+        does not have timezone information), the system local timezone
+        is used to construct an aware datetime object.
+        Datetime objects are then transformed into a str, before being assigned
+        to the observed_at attribute
 
     unitCode (optional): str
         Unit code of the measurement unit, encoded using the UN/CEFACT Common
@@ -29,12 +123,17 @@ class Property():
     Return:
     -------
     Property: an instance of this class
+
+    Raise:
+    ------
+    TypeError
     '''
     def __init__(self, name, value, observed_at=None, unit_code=None,
                  datasetid=None, properties=None, relationships=None):
         self._name = name
         self._value = value
-        self._observed_at = observed_at
+        # calling observed_at setter from __init__
+        self._observed_at = self.observed_at = observed_at
         self._unit_code = unit_code
         self._datasetid = datasetid
         if properties is not None:
@@ -75,7 +174,15 @@ class Property():
 
     @observed_at.setter
     def observed_at(self, observed_at):
-        self._observed_at = observed_at
+        if observed_at is None:
+            self._observed_at = None
+        elif isinstance(observed_at, datetime):
+            self._observed_at = as_isoformat(observed_at)
+        elif isinstance(observed_at, str):
+            self._observed_at = observed_at
+        else:
+            raise TypeError(
+                'observed_at is expecting to be of type datetime or str')
 
     # unit_code attribute
     @property
@@ -298,9 +405,14 @@ class Relationship():
     object_: URI
         The target object of the relationship
 
-    observed_at (optional): str
-        DateTime of the observation of the relationship, as str encoded using
-        ISO 8601 'Extended Format'
+    observed_at (optional): str, datetime object
+        DateTime of the observation of the relationship either as str encoded
+        using ISO 8601 'Extended Format', or as a datetime object
+        When a datetime object is used, if the datetime object is naive (i.e.
+        does not have timezone information), the system local timezone
+        is used to construct an aware datetime object.
+        Datetime objects are then transformed into a str, before being assigned
+        to the observed_at attribute
 
     datasetid (optional): URI
         Identify an instance of a relationship
@@ -321,7 +433,8 @@ class Relationship():
         self._name = name
         self._type = 'Relationship'
         self._object_ = object_
-        self._observed_at = observed_at
+        # calling observed_at setter from __init__
+        self._observed_at = self.observed_at = observed_at
         self._datasetid = datasetid
         if properties is not None:
             self._properties = properties
@@ -362,7 +475,15 @@ class Relationship():
 
     @observed_at.setter
     def observed_at(self, observed_at):
-        self._observed_at = observed_at
+        if observed_at is None:
+            self._observed_at = None
+        elif isinstance(observed_at, datetime):
+            self._observed_at = as_isoformat(observed_at)
+        elif isinstance(observed_at, str):
+            self._observed_at = observed_at
+        else:
+            raise TypeError(
+                'observed_at is expecting to be of type datetime or str')
 
     # datasetid attribute
     @property
