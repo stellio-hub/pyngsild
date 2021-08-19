@@ -83,3 +83,7 @@ response = ctxb.create_entity(request_headers=headers, entity=entity_1)
 ```bash
 pip install git+https://{token}@github.com/stellio-hub/pyngsild
 ```
+Or alternatively:
+```bash
+pip install git+ssh://git@github.com/stellio-hub/pyngsild
+```
