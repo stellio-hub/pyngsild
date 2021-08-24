@@ -127,3 +127,32 @@ def test_entity_one_property_one_sub_property_to_nsgild():
         }
     }
     assert e.to_ngsild() == ngsild_true
+
+
+def test_entity_one_property_one_geoproperty_to_ngsild():
+    e = conf.ent_1()
+    e.at_context = conf.AT_CONTEXT
+    p = conf.prop_1()
+    gp = conf.geoprop_1()
+    e.add_properties([p, gp])
+    ngsild_true = {
+        '@context': [
+            'https://raw.githubusercontent.com/dummy/ngsild-api-data-models/'
+            'main/jsonld-contexts/mydummy-contexts.jsonld'
+        ],
+        'id': 'uri:entity:1',
+        'type': 'ENTITY',
+        'plant_health': {
+            'type': 'Property',
+            'value': 5,
+            'observedAt': conf.OBSERVED_AT
+        },
+        'location': {
+            'type': 'GeoProperty',
+            'value': {
+                'type': 'Point',
+                'coordinates': [39.2753478, 16.4077153]
+            }
+        }
+    }
+    assert e.to_ngsild() == ngsild_true

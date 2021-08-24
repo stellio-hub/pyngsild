@@ -1,4 +1,4 @@
-'''This module define the Property and Relationship class.
+'''This module define the Property, GeoProperty and Relationship class.
 
 The Property class allows to create an NGSI-LD property. As per NGSI-LD
 specification, a property could itself contains one or more properties.
@@ -7,6 +7,17 @@ specification, a property could itself contains one or more properties.
 
     prop1 = Property(name='uv_index', value=10)
     prop2 = Property(name='temperature', value=15, unitCode='CEL')
+
+The GeoProperty is a specific type of property, i.e. a Geospatial property,
+that is having a value being a GeoJSON Geometry.
+A GeoProperty is deemed 'final', i.e. it cannot contains other properties.
+Similarly, it cannot contains relationships.
+
+    Typical usage examples:
+
+    geoprop1 = GeoProperty(name='location',
+                           value={"type": "Point",
+                           "coordinates": [39.2753478, 16.4077153]})
 
 The Relationship class allows to create an NGSI-LD relationship. As per NGSI-LD
 specification, similarly to Property, a relationship could itself contains one
@@ -87,13 +98,175 @@ def as_isoformat(dt):
     return(str_dt)
 
 
-class Property():
+class BaseProperty():
+    ''' Abstract class for Property and GeoProperty classes
+
+    Both Property and GeoProperty will be instance of BaseProperty,
+    facilitating addition of properties to a property, entity or relationship.
+
+    Args:
+    -----
+    name: str
+        Name of the property
+
+    observed_at (optional): str, datetime object
+        DateTime of the observation of the property either as str encoded using
+        ISO 8601 'Extended Format', or as a datetime object
+        When a datetime object is used, if the datetime object is naive (i.e.
+        does not have timezone information), the system local timezone
+        is used to construct an aware datetime object.
+        Datetime objects are then transformed into a str, before being assigned
+        to the observed_at attribute
+
+    datasetid (optional): URI
+        Identify an instance of a property
+
+    Return:
+    -------
+    BaseProperty: an instance of this class
+
+    Raise:
+    ------
+    TypeError
+    '''
+    def __init__(self, name, observed_at=None, datasetid=None):
+        self._name = name
+        # calling observed_at setter from __init__
+        self._observed_at = self.observed_at = observed_at
+        self._datasetid = datasetid
+    
+    # name attribute
+    @property
+    def name(self):
+        return(self._name)
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+
+    # observed_at attribute
+    @property
+    def observed_at(self):
+        return(self._observed_at)
+
+    @observed_at.setter
+    def observed_at(self, observed_at):
+        if observed_at is None:
+            self._observed_at = None
+        elif isinstance(observed_at, datetime):
+            self._observed_at = as_isoformat(observed_at)
+        elif isinstance(observed_at, str):
+            self._observed_at = observed_at
+        else:
+            raise TypeError(
+                'observed_at is expecting to be of type datetime or str')
+
+    # datasetid attribute
+    @property
+    def datasetid(self):
+        return(self._datasetid)
+
+    @datasetid.setter
+    def datasetid(self, datasetid):
+        self._datasetid = datasetid
+
+
+class GeoProperty(BaseProperty):
+    '''
+    The GeoProperty class represent a Geospatial property object as defined by
+    the NGSI-LD information model.
+    A GeoProperty is considered 'final', i.e. no property or relationship can
+    be added to a GeoProperty.
+
+    Parameters:
+    -----------
+    name: str
+        Name of the property
+
+    value: dict
+        A dictionnary containing the type of GeoJSON geometry which is made up
+        of a type (e.g. Point, LineString, etc.) and of coordinates.
+
+    observed_at (optional): str, datetime object
+        DateTime of the observation of the property either as str encoded using
+        ISO 8601 'Extended Format', or as a datetime object
+        When a datetime object is used, if the datetime object is naive (i.e.
+        does not have timezone information), the system local timezone
+        is used to construct an aware datetime object.
+        Datetime objects are then transformed into a str, before being assigned
+        to the observed_at attribute
+
+    datasetid (optional): URI
+        Identify an instance of a property
+
+    Return:
+    -------
+    GeoProperty: an instance of this class
+
+    Raise:
+    ------
+    TypeError
+    '''
+    def __init__(self, name, value, observed_at=None, datasetid=None):
+        super().__init__(name=name, observed_at=observed_at,
+                         datasetid=datasetid)
+        # calling value at setter from __init__
+        self._value = self.value = value
+    
+    # Object representation
+    def __repr__(self):
+        return(f'GeoProperty(name=\'{self.name}\', value=\'{self.value}\')')
+
+    # value attribute
+    @property
+    def value(self):
+        return(self._value)
+
+    @value.setter
+    def value(self, value):
+        if isinstance(value, dict):
+            self._value = value
+        else: 
+            raise TypeError(
+                '\'value\' is expected to be of type Dictionary'+
+                ' as a GeoJSON geometry'
+                )
+    
+    def to_ngsild(self):
+        '''
+        Generate a NGSI-LD compliant representation of this instance of
+        GeoProperty.
+
+        Parameters:
+        -----------
+        None
+
+        Return:
+        -------
+        ngsild: Dictionary
+            NGSI-LD compliant representation of this GeoProperty
+        '''
+        ngsild = {
+            self._name: {
+                'type': 'GeoProperty',
+                'value': self._value
+            }
+        }
+        if self._observed_at is not None:
+            ngsild[self._name]['observedAt'] = self._observed_at
+        if self._datasetid is not None:
+            ngsild[self._name]['datasetId'] = self._datasetid
+
+        return(ngsild)
+
+
+class Property(BaseProperty):
     '''
     The Property class represent a Property object as defined by the NGSI-LD
     information model
 
-    Parameters:
-    -----------
+    Args:
+    -----
     name: str
         Name of the property
 
@@ -130,12 +303,10 @@ class Property():
     '''
     def __init__(self, name, value, observed_at=None, unit_code=None,
                  datasetid=None, properties=None, relationships=None):
-        self._name = name
+        super().__init__(name=name, observed_at=observed_at,
+                         datasetid=datasetid)
         self._value = value
-        # calling observed_at setter from __init__
-        self._observed_at = self.observed_at = observed_at
         self._unit_code = unit_code
-        self._datasetid = datasetid
         if properties is not None:
             self._properties = properties
         else:
@@ -149,15 +320,6 @@ class Property():
     def __repr__(self):
         return(f'Property(name=\'{self.name}\', value=\'{self.value}\')')
 
-    # name attribute
-    @property
-    def name(self):
-        return(self._name)
-
-    @name.setter
-    def name(self, name):
-        self._name = name
-
     # value attribute
     @property
     def value(self):
@@ -167,23 +329,6 @@ class Property():
     def value(self, value):
         self._value = value
 
-    # observed_at attribute
-    @property
-    def observed_at(self):
-        return(self._observed_at)
-
-    @observed_at.setter
-    def observed_at(self, observed_at):
-        if observed_at is None:
-            self._observed_at = None
-        elif isinstance(observed_at, datetime):
-            self._observed_at = as_isoformat(observed_at)
-        elif isinstance(observed_at, str):
-            self._observed_at = observed_at
-        else:
-            raise TypeError(
-                'observed_at is expecting to be of type datetime or str')
-
     # unit_code attribute
     @property
     def unit_code(self):
@@ -192,15 +337,6 @@ class Property():
     @unit_code.setter
     def unit_code(self, unit_code):
         self._unit_code = unit_code
-
-    # datasetid attribute
-    @property
-    def datasetid(self):
-        return(self._datasetid)
-
-    @datasetid.setter
-    def datasetid(self, datasetid):
-        self._datasetid = datasetid
 
     # properties attribute
     @property
@@ -216,13 +352,16 @@ class Property():
         '''
         if properties is None:
             self._properties = None
-        elif isinstance(properties, Property):
+        elif isinstance(properties, BaseProperty):
             self._properties = [properties]
         elif isinstance(properties, list):
-            if not any(not isinstance(p, Property) for p in properties):
+            if not any(not isinstance(p, BaseProperty) for p in properties):
                 self._properties = properties
         else:
-            raise TypeError
+            raise TypeError(
+                '\'properties\' is expected to be of type Property'+
+                ' or GeoProperty, or a List of type Property or GeoProperty'
+                )
 
     # relationships attribute
     @property
@@ -245,7 +384,9 @@ class Property():
                        for r in relationships):
                 self._relationships = relationships
         else:
-            raise TypeError
+            raise TypeError(
+                '\'relationships\' is expected to be of type Relationship'
+                )
 
     # Add property(ies) to this instance of Property
     def add_properties(self, properties):
@@ -276,7 +417,7 @@ class Property():
         # when Relationship does not already have any property, the Property
         # is added as a list. That will makes future addition of property/ies
         # easier (i.e. the property is appended)
-        elif isinstance(properties, Property):
+        elif isinstance(properties, BaseProperty):
             if self._properties is None:
                 self._properties = [properties]
             else:
@@ -288,14 +429,17 @@ class Property():
         # self._properties is None) or we add each property to the existing
         # properties.
         elif isinstance(properties, list):
-            if not any(not isinstance(p, Property) for p in properties):
+            if not any(not isinstance(p, BaseProperty) for p in properties):
                 if self._properties is None:
                     self._properties = properties
                 else:
                     for property_ in properties:
                         self._properties.append(property_)
         else:
-            raise TypeError
+            raise TypeError(
+                '\'properties\' is expected to be of type Property'+
+                ' or GeoProperty, or a List of type Property or GeoProperty'
+                )
 
     # Add relationship(s) to this instance of Property
     def add_relationships(self, relationships):
@@ -346,7 +490,9 @@ class Property():
                     for relationship in relationships:
                         self._relationships.append(relationship)
         else:
-            raise TypeError
+            raise TypeError(
+                '\'relationships\' is expected to be of type Relationship'
+                )
 
     def to_ngsild(self):
         '''
@@ -508,13 +654,16 @@ class Relationship():
         '''
         if properties is None:
             self._properties = None
-        elif isinstance(properties, Property):
+        elif isinstance(properties, BaseProperty):
             self._properties = [properties]
         elif isinstance(properties, list):
-            if not any(not isinstance(p, Property) for p in properties):
+            if not any(not isinstance(p, BaseProperty) for p in properties):
                 self._properties = properties
         else:
-            raise TypeError
+            raise TypeError(
+                '\'properties\' is expected to be of type Property'+
+                ' or GeoProperty, or a List of type Property or GeoProperty'
+                )
 
     # relationships attribute
     @property
@@ -536,7 +685,9 @@ class Relationship():
             if not any(not isinstance(r, Relationship) for r in relationships):
                 self._relationships = relationships
         else:
-            raise TypeError
+            raise TypeError(
+                '\'relationships\' is expected to be of type Relationship'
+                )
 
     # Add property(ies) to this instance of Relationship
     def add_properties(self, properties):
@@ -567,7 +718,7 @@ class Relationship():
         # when Relationship does not already have any property, the Property
         # is added as a list. That will makes future addition of property/ies
         # easier (i.e. the property is appended)
-        elif isinstance(properties, Property):
+        elif isinstance(properties, BaseProperty):
             if self._properties is None:
                 self._properties = [properties]
             else:
@@ -579,14 +730,17 @@ class Relationship():
         # self._properties is None) or we add each property to the existing
         # properties.
         elif isinstance(properties, list):
-            if not any(not isinstance(p, Property) for p in properties):
+            if not any(not isinstance(p, BaseProperty) for p in properties):
                 if self._properties is None:
                     self._properties = properties
                 else:
                     for property_ in properties:
                         self._properties.append(property_)
         else:
-            raise TypeError
+            raise TypeError(
+                '\'properties\' is expected to be of type Property'+
+                ' or GeoProperty, or a List of type Property or GeoProperty'
+                )
 
     # Add relationship(s) to this instance of Relationship
     def add_relationships(self, relationships):
@@ -636,7 +790,9 @@ class Relationship():
                     for relationship in relationships:
                         self._relationships.append(relationship)
         else:
-            raise TypeError
+            raise TypeError(
+                '\'relationships\' is expected to be of type Relationship'
+                )
 
     def to_ngsild(self):
         '''

@@ -1,13 +1,13 @@
-from pyngsild.proprel import Property, Relationship
-
+from pyngsild.proprel import BaseProperty, Property
+from pyngsild.proprel import Relationship
 
 class Entity():
     '''
     The Entity class represent an Entity object as defined by the NGSI-LD
     information model
 
-    Parameters:
-    -----------
+    Args:
+    -----
     id: URI
         Identifier of the entity
 
@@ -23,6 +23,10 @@ class Entity():
     Return:
     -------
     Entity: an instance of this class
+
+    Raise:
+    ------
+    TypeError
     '''
     def __init__(self, id, type, properties=None, relationships=None):
         self.id = id
@@ -83,13 +87,16 @@ class Entity():
         '''
         if properties is None:
             self._properties = None
-        elif isinstance(properties, Property):
+        elif isinstance(properties, BaseProperty):
             self._properties = [properties]
         elif isinstance(properties, list):
-            if not any(not isinstance(p, Property) for p in properties):
+            if not any(not isinstance(p, BaseProperty) for p in properties):
                 self._properties = properties
         else:
-            raise TypeError
+            raise TypeError(
+                '\'properties\' is expected to be of type Property'+
+                ' or GeoProperty, or a List of type Property or GeoProperty'
+                )
 
     # relationships attribute
     @property
@@ -141,7 +148,7 @@ class Entity():
         # when Entity does not already have any property, the Property
         # is added as a list. That will makes future addition of
         # property/ies easier (i.e. the property is appended)
-        elif isinstance(properties, Property):
+        elif isinstance(properties, BaseProperty):
             if self._properties is None:
                 self._properties = [properties]
             else:
@@ -153,14 +160,17 @@ class Entity():
         # self._properties is None) or we add each property to the existing
         # properties.
         elif isinstance(properties, list):
-            if not any(not isinstance(p, Property) for p in properties):
+            if not any(not isinstance(p, BaseProperty) for p in properties):
                 if self._properties is None:
                     self._properties = properties
                 else:
                     for property_ in properties:
                         self._properties.append(property_)
         else:
-            raise TypeError
+            raise TypeError(
+                '\'properties\' is expected to be of type Property'+
+                ' or GeoProperty, or a List of type Property or GeoProperty'
+                )
 
     # Add relationship(s) to this entity
     def add_relationships(self, relationships):
