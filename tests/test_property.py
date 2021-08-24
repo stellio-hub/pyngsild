@@ -1,4 +1,4 @@
-from pyngsild.proprel import Property
+from pyngsild.proprel import Property, GeoProperty
 from . conftests import ConfTests
 
 
@@ -62,3 +62,21 @@ def test_to_ngsild_one_sub_property():
         }
     }
     assert p.to_ngsild() == ngsild_true
+
+
+def test_geoproperty():
+    gp = GeoProperty(name='location',
+                    value={
+                        'type': 'Point',
+                        'coordinates': [39.2753478, 16.4077153]
+                    })
+    ngsild_true = {
+        'location': {
+            'type': 'GeoProperty',
+            'value': {
+                'type': 'Point',
+                'coordinates': [39.2753478, 16.4077153]
+            }
+        }
+    }
+    assert gp.to_ngsild() == ngsild_true

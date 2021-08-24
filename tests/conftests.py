@@ -1,5 +1,6 @@
 from pyngsild.entity import Entity
 from pyngsild.proprel import Property
+from pyngsild.proprel import GeoProperty
 from pyngsild.proprel import Relationship
 from datetime import datetime, timezone
 import pytz
@@ -106,6 +107,13 @@ class ConfTests():
         p = Property(name='pH', value=7.3, observed_at=self._OBSERVED_AT,
                      unit_code='C62')
         return(p)
+    
+    def geoprop_1(self):
+        gp = GeoProperty(name='location', value={
+                'type': 'Point',
+                'coordinates': [39.2753478, 16.4077153]
+            })
+        return(gp)
 
     def rel_1(self):
         r = Relationship(name=self._R_NAME, object_=self._R_OBJECT,
