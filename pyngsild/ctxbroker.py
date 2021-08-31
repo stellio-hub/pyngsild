@@ -53,10 +53,9 @@ class ContextBroker:
 
         Returns:
         -------
-        response: requests.models.Response
-            the response from the Context Broker.
-            if the request is successful, entities are
-            accessible as JSON at r.json()
+        response: HTTP status code indicating success or failure. Detailed
+            errors or returned information are available as json with
+            response.json()
         """
         response = requests.get(url=self.cb_host + URL_ENTITIES,
                                 headers=request_headers, params=query_params)
@@ -79,9 +78,9 @@ class ContextBroker:
 
         Returns:
         -------
-        response: requests.models.Response
-            the response from the Context Broker. if the request is successful,
-            the entity is accessible as JSON at r.json()
+        response: HTTP status code indicating success or failure. Detailed
+            errors or returned information are available as json with
+            response.json()
         """
         response = requests.get(url=self.cb_host + URL_ENTITIES + entity_id,
                                 headers=request_headers)
@@ -104,7 +103,9 @@ class ContextBroker:
 
         Returns:
         -------
-        response: requests.models.Response
+        response: HTTP status code indicating success or failure. Detailed
+            errors or returned information are available as json with
+            response.json()
 
         Raises:
         ------
@@ -123,9 +124,9 @@ class ContextBroker:
                                  entity: Entity,
                                  fragment: Union[Property, Relationship])\
                                  -> requests.models.Response:
-        """Update an entity fragment into the Context Broker
+        """Update entity attributes into the Context Broker
 
-        An entity fragment can be a Property or Relationship
+        An entity attributes can be a Property or Relationship
 
         (NGSI-LD "Update Entity Attributes" operation,
          HTTP Binding: PATCH entities/{entityId}/attrs/)
@@ -140,7 +141,9 @@ class ContextBroker:
 
         Returns:
         -------
-        response: requests.models.Response
+        response: HTTP status code indicating success or failure. Detailed
+            errors or returned information are available as json with
+            response.json()
 
         Raises:
         ------
@@ -148,7 +151,8 @@ class ContextBroker:
         """
         if not isinstance(entity, Entity):
             raise TypeError('entity must be of type \'Entity\'')
-        if not (isinstance(fragment, Property) or isinstance(fragment, Relationship)):
+        if not (isinstance(fragment, Property) 
+                or isinstance(fragment, Relationship)):
             raise TypeError('fragment must be of type \'Property\''+
                             'or \'Relationship\'')
         else:
@@ -161,21 +165,68 @@ class ContextBroker:
             )
         return response
 
-    def delete_entity(self, request_headers, entity_id):
-        """
-        Delete an entity by id from the Context Broker
+    def append_entity_attributes(self, request_headers: dict,
+                                 entity: Entity,
+                                 fragment: Union[Property, Relationship])\
+                                 -> requests.models.Response:
+        """Append attributes to an entity into the Context Broker
 
-        Parameters:
-        -----------
-        request_headers: dict
-            Request Headers
+        An entity attributes can be a Property or Relationship
 
-        entity_id: URI
-            The unique identifier of the entity
+        (NGSI-LD "Append Entity Attributes" operation,
+         HTTP Binding: POST entities/{entityId}/attrs/)
 
-        Return:
+        Args:
+        -----
+        request_headers: A Request Headers
+        entity: An instance of Entity, the entity for which the attributes
+            will be appended
+        fragment: The entity's fragment to update as a Property/Relationship
+            instance 
+
+        Returns:
         -------
-        response: requests.models.Response
+        response: HTTP status code indicating success or failure. Detailed
+            errors or returned information are available as json with
+            response.json()
+
+        Raises:
+        ------
+        TypeError
+        """
+        if not isinstance(entity, Entity):
+            raise TypeError('entity must be of type \'Entity\'')
+        if not (isinstance(fragment, Property)
+                or isinstance(fragment, Relationship)):
+            raise TypeError('fragment must be of type \'Property\''+
+                            'or \'Relationship\'')
+        else:
+            ngsild_fragment = fragment.to_ngsild()
+            ngsild_fragment['@context'] = entity.at_context
+            response = requests.post(
+                url=self.cb_host + URL_ENTITIES + entity.id + '/attrs/',
+                json=ngsild_fragment,
+                headers=request_headers
+            )
+        return response
+
+    def delete_entity(self, request_headers: dict,
+                      entity_id: str) -> requests.models.Response:
+        """Delete an entity by id from the Context Broker
+
+        (NGSI-LD "Delete Entity" operation,
+         HTTP Binding: DELETE entities/{entityId})
+
+        Args:
+        -----
+        request_headers: A Request Headers
+        entity_id: The unique identifier of the entity
+
+        Returns:
+        -------
+        response: HTTP status code indicating success or failure. Detailed
+            errors or returned information are available as json with
+            response.json()
         """
 
         response = requests.delete(url=self.cb_host + URL_ENTITIES
