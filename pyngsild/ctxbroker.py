@@ -66,7 +66,7 @@ class ContextBroker:
         """Retrieve an entity by id from the Context Broker
 
         (NGSI-LD "Retrieve Entity" operation,
-         HTTP Binding: GET entities/{entity})
+         HTTP Binding: GET entities/{entityId})
 
         Args:
         -----
@@ -88,7 +88,7 @@ class ContextBroker:
 
     def create_entity(self, request_headers: dict,
                       entity: Entity) -> requests.models.Response:
-        """Create an entity by id into the Context Broker
+        """Create an entity into the Context Broker
 
         (NGSI-LD "Create Entity" operation,
          HTTP Binding: POST entities/)
@@ -121,7 +121,8 @@ class ContextBroker:
         return response
 
     def update_entity_attributes(self, request_headers: dict,
-                                 entity: Entity,
+                                 entity_id: str,
+                                 at_context: str,
                                  fragment: Union[Property, Relationship])\
                                  -> requests.models.Response:
         """Update entity attributes into the Context Broker
@@ -134,8 +135,8 @@ class ContextBroker:
         Args:
         -----
         request_headers: A Request Headers
-        entity: An instance of Entity, the entity for which the fragment will
-            be updated
+        entity_id: URN of the entity for which the fragment will be updated
+        at_context: The context information
         fragment: The entity's fragment to update as a Property/Relationship
             instance 
 
@@ -149,24 +150,23 @@ class ContextBroker:
         ------
         TypeError
         """
-        if not isinstance(entity, Entity):
-            raise TypeError('entity must be of type \'Entity\'')
         if not (isinstance(fragment, Property) 
                 or isinstance(fragment, Relationship)):
             raise TypeError('fragment must be of type \'Property\''+
                             'or \'Relationship\'')
         else:
             ngsild_fragment = fragment.to_ngsild()
-            ngsild_fragment['@context'] = entity.at_context
+            ngsild_fragment['@context'] = at_context
             response = requests.patch(
-                url=self.cb_host + URL_ENTITIES + entity.id + '/attrs/',
+                url=self.cb_host + URL_ENTITIES + entity_id + '/attrs/',
                 json=ngsild_fragment,
                 headers=request_headers
             )
         return response
 
     def append_entity_attributes(self, request_headers: dict,
-                                 entity: Entity,
+                                 entity_id: str,
+                                 at_context: str,
                                  fragment: Union[Property, Relationship])\
                                  -> requests.models.Response:
         """Append attributes to an entity into the Context Broker
@@ -179,8 +179,8 @@ class ContextBroker:
         Args:
         -----
         request_headers: A Request Headers
-        entity: An instance of Entity, the entity for which the attributes
-            will be appended
+        entity_id: URN of the entity for which the fragment will be updated
+        at_context: The context information
         fragment: The entity's fragment to update as a Property/Relationship
             instance 
 
@@ -194,17 +194,15 @@ class ContextBroker:
         ------
         TypeError
         """
-        if not isinstance(entity, Entity):
-            raise TypeError('entity must be of type \'Entity\'')
         if not (isinstance(fragment, Property)
                 or isinstance(fragment, Relationship)):
             raise TypeError('fragment must be of type \'Property\''+
                             'or \'Relationship\'')
         else:
             ngsild_fragment = fragment.to_ngsild()
-            ngsild_fragment['@context'] = entity.at_context
+            ngsild_fragment['@context'] = at_context
             response = requests.post(
-                url=self.cb_host + URL_ENTITIES + entity.id + '/attrs/',
+                url=self.cb_host + URL_ENTITIES + entity_id + '/attrs/',
                 json=ngsild_fragment,
                 headers=request_headers
             )
