@@ -12,7 +12,8 @@ QUERY_ENTITIES_EXPECTATION = [
 class TestContextBroker:
 
     def set_up(self):
-        self.context_broker = ContextBroker(CONTEXT_BROKER_URL)
+        self.context_broker = ContextBroker()
+        self.context_broker._cb_host = CONTEXT_BROKER_URL
 
     @pytest.mark.server(
         url='/ngsi-ld/v1/entities/',
@@ -23,7 +24,6 @@ class TestContextBroker:
     def test_query_entities(self):
         self.set_up()
         response = self.context_broker.query_entities(
-            {'Authorization': 'Bearer token'},
             {'type': "Vehicle", 'idPattern': '^urn:ngsi-ld:Vehicle:.*'}
         )
         assert response.status_code == 200
