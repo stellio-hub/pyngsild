@@ -10,7 +10,8 @@ The library defines Classes for each element of the NGSI-LD data model, namely:
 
 Then, a **ContextBroker** Class implements the NGSI-LD operations (e.g. Create Entity). The current implementation supports:
 * *Create Entity*,
-* *Partial Attribute update*,
+* *Update Entity Attributes*,
+* *Append Entity Attributes*,
 * *Delete Entity*,
 * *Retrieve Entity*,
 * *Query Entities*
@@ -40,8 +41,19 @@ property_2 = Property(name='property_name', value='property_value',
                        observed_at='some_date_time', unit_code='a_unit_code',
                        datasetid='uri:prop:datatsetid')
 ```
-It is then easy to add a property to an entity:
+
+GeoProperty are supported and can be created with:
 ```python
+from pyngsild.proprel import GeoProperty
+
+geo_property = GeoProperty(name='location',
+                           value='{'type': 'Point',
+                                   'coordinates': [46.969047065728226, 19.649525998191066]}')
+```
+
+It is then easy to add a property to an entity or to another property:
+```python
+property_1.add(geo_property)
 entity_1.add(property_1)
 ```
 #
@@ -62,7 +74,7 @@ And a relationship can be added to a property:
 ```python
 property_1.add(relationship_1)
 ```
-At this stage, the **entity_1** has a property **property_1**, which has a **relationship_1**, which has a property **property_2**.
+At this stage, the **entity_1** has a property **property_1**, which has a **geo_property** and a **relationship_1**, which itself has a property **property_2**.
 
 The NGSI-LD json representation of this entity can be simply displayed with:
 ```python
@@ -74,11 +86,17 @@ Operations to a NGSI-LD Context Broker are supported through the ContextBroker C
 ```python
 from pyngsild.ctxbroker import ContextBroker
 
-ctxb = ContextBroker('https://my/context/broker')
-headers = {'Authorization': 'Bearer the_token', 
-           'Content-Type': 'application/ld+json'}
-response = ctxb.create_entity(request_headers=headers, entity=entity_1)
+ctxb = ContextBroker()
+response = ctxb.create_entity(entity=entity_1)
 ```
+ContextBroker manage authorisation tokens to access a Context Broker, that is getting and renewing an access token. For this, ContextBroker() requires the following environment variables:
+* **PYNGSILD_SSO_SERVER_URL**: Environment variable for the SSO server URL
+* **PYNGSILD_SSO_CLIENT_ID**: Environment variable for the client_id
+* **PYNGSILD_SSO_CLIENT_SECRET** = Environment variable for the client_secret
+
+Also, the following environment variable is required for the URL of the Context Broker:
+* **PYNGSILD_CB_HOST**: Environment variable for Context Broker host URL
+#
 ## Installation
 ```bash
 pip install git+https://{token}@github.com/stellio-hub/pyngsild
