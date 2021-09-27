@@ -174,8 +174,8 @@ class ContextBroker:
 
     @renew_access_token
     def update_entity_attributes(self, entity_id: str, at_context: str,
-                                 fragment: Union[Property, Relationship])\
-            -> requests.models.Response:
+                                 fragment: Union[Property, Relationship]
+                                 ) -> requests.models.Response:
         """Update entity attributes into the Context Broker
 
         An entity attributes can be a Property or Relationship
@@ -216,11 +216,12 @@ class ContextBroker:
 
     @renew_access_token
     def append_entity_attributes(self, entity_id: str, at_context: str,
-                                 fragment: Union[Property, Relationship])\
-            -> requests.models.Response:
+                                 fragments: Union[Property, Relationship,
+                                                  list]
+                                 ) -> requests.models.Response:
         """Append attributes to an entity into the Context Broker
 
-        An entity attributes can be a Property or Relationship
+        An entity attributes can be of type Property, Relationship or list
 
         (NGSI-LD "Append Entity Attributes" operation,
          HTTP Binding: POST entities/{entityId}/attrs/)
@@ -229,8 +230,8 @@ class ContextBroker:
         -----
         entity_id: URN of the entity for which the fragment will be updated
         at_context: The context information
-        fragment: The entity's fragment to update as a Property/Relationship
-            instance
+        fragments: The entity's fragment(s) to update as an instance of type
+        Property, Relationship or list
 
         Returns:
         -------
@@ -242,18 +243,34 @@ class ContextBroker:
         ------
         TypeError
         """
-        if not (isinstance(fragment, Property)
-                or isinstance(fragment, Relationship)):
+        if not isinstance(fragments, (Property, Relationship, list)):
             raise TypeError('fragment must be of type \'Property\'' +
-                            'or \'Relationship\'')
-        else:
-            ngsild_fragment = fragment.to_ngsild()
+                            ', \'Relationship\' or \'list\'')
+
+        # if not a list, append the single fragment
+        if isinstance(fragments, (Property, Relationship)):
+            ngsild_fragment = fragments.to_ngsild()
             ngsild_fragment['@context'] = at_context
-            response = requests.post(
-                url=self.cb_host + self._URL_ENTITIES + entity_id + '/attrs/',
-                json=ngsild_fragment,
-                headers=self.headers
-            )
+
+        else:
+            # if a list, first make sure all items in the list are
+            # (Property, Relationship), then build a ngsild_fragment from all
+            # fragments in the list
+            if not all(isinstance(fragment, (Property, Relationship))
+                       for fragment in fragments):
+                raise TypeError('All fragments in the list must be of type' +
+                                ' \'Property\' or \'Relationship\'')
+
+            ngsild_fragment = {}
+            for fragment in fragments:
+                ngsild_fragment.update(fragment.to_ngsild())
+            ngsild_fragment['@context'] = at_context
+
+        response = requests.post(
+            url=self.cb_host + self._URL_ENTITIES + entity_id + '/attrs/',
+            json=ngsild_fragment,
+            headers=self.headers
+        )
         return response
 
     @renew_access_token
