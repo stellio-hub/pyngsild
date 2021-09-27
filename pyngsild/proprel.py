@@ -36,11 +36,11 @@ def is_dt_aware(dt):
 
     An aware datetime object can locate itself relative to other aware objects
     (such datetime object typically includes time zone information).
-    
+
     A datetime object dt is aware if:
         dt.tzinfo is not None
         dt.tzinfo.utcoffset(dt) does not return None
-    
+
     Args:
     -----
     dt: datetime
@@ -76,7 +76,7 @@ def as_isoformat(dt):
         Will be transformed into the string:
 
             '2021-07-21T13:23:54.078099+00:00'
-    
+
     Args:
     -----
     dt: datetime
@@ -134,7 +134,7 @@ class BaseProperty():
         # calling observed_at setter from __init__
         self._observed_at = self.observed_at = observed_at
         self._datasetid = datasetid
-    
+
     # name attribute
     @property
     def name(self):
@@ -212,7 +212,7 @@ class GeoProperty(BaseProperty):
                          datasetid=datasetid)
         # calling value at setter from __init__
         self._value = self.value = value
-    
+
     # Object representation
     def __repr__(self):
         return(f'GeoProperty(name=\'{self.name}\', value=\'{self.value}\')')
@@ -226,12 +226,12 @@ class GeoProperty(BaseProperty):
     def value(self, value):
         if isinstance(value, dict):
             self._value = value
-        else: 
+        else:
             raise TypeError(
-                '\'value\' is expected to be of type Dictionary'+
+                '\'value\' is expected to be of type Dictionary' +
                 ' as a GeoJSON geometry'
                 )
-    
+
     def to_ngsild(self):
         '''
         Generate a NGSI-LD compliant representation of this instance of
@@ -359,7 +359,7 @@ class Property(BaseProperty):
                 self._properties = properties
         else:
             raise TypeError(
-                '\'properties\' is expected to be of type Property'+
+                '\'properties\' is expected to be of type Property' +
                 ' or GeoProperty, or a List of type Property or GeoProperty'
                 )
 
@@ -437,7 +437,7 @@ class Property(BaseProperty):
                         self._properties.append(property_)
         else:
             raise TypeError(
-                '\'properties\' is expected to be of type Property'+
+                '\'properties\' is expected to be of type Property' +
                 ' or GeoProperty, or a List of type Property or GeoProperty'
                 )
 
@@ -661,7 +661,7 @@ class Relationship():
                 self._properties = properties
         else:
             raise TypeError(
-                '\'properties\' is expected to be of type Property'+
+                '\'properties\' is expected to be of type Property' +
                 ' or GeoProperty, or a List of type Property or GeoProperty'
                 )
 
@@ -738,7 +738,7 @@ class Relationship():
                         self._properties.append(property_)
         else:
             raise TypeError(
-                '\'properties\' is expected to be of type Property'+
+                '\'properties\' is expected to be of type Property' +
                 ' or GeoProperty, or a List of type Property or GeoProperty'
                 )
 
