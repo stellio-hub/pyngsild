@@ -1,5 +1,6 @@
-from pyngsild.proprel import BaseProperty, Property
+from pyngsild.proprel import BaseProperty
 from pyngsild.proprel import Relationship
+
 
 class Entity():
     '''
@@ -94,7 +95,7 @@ class Entity():
                 self._properties = properties
         else:
             raise TypeError(
-                '\'properties\' is expected to be of type Property'+
+                '\'properties\' is expected to be of type Property' +
                 ' or GeoProperty, or a List of type Property or GeoProperty'
                 )
 
@@ -168,7 +169,7 @@ class Entity():
                         self._properties.append(property_)
         else:
             raise TypeError(
-                '\'properties\' is expected to be of type Property'+
+                '\'properties\' is expected to be of type Property' +
                 ' or GeoProperty, or a List of type Property or GeoProperty'
                 )
 
